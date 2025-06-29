@@ -1,17 +1,173 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  body {
+    font-feature-settings: "rlig" 1, "calt" 1;
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+      monospace;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components {
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+  
+  .glass-dark {
+    @apply bg-gray-900/30 backdrop-blur-md border border-gray-800/30;
+  }
+  
+  .card-gradient {
+    @apply bg-white;
+  }
+  
+  .card-gradient-dark {
+    @apply bg-gray-800;
+  }
+  
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+  }
+  
+  .input-glow:focus {
+    @apply ring-2 ring-primary-500/50 border-primary-500 shadow-glow;
+  }
+  
+  .button-glow {
+    @apply transition-all duration-200 hover:shadow-glow hover:scale-105;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    transition: all 0.2s ease;
+  }
+  
+  .slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+  }
+  
+  .slider::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    transition: all 0.2s ease;
+  }
+  
+  .slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.4);
+  }
+  
+  .metric-card {
+    @apply relative overflow-hidden;
+  }
+  
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(59, 130, 246, 0.5),
+      transparent
+    );
+  }
+}
+
+@layer utilities {
+  
+  .animate-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  .animate-in-delay-1 {
+    animation: fadeIn 0.5s ease-out 0.1s both;
+  }
+  
+  .animate-in-delay-2 {
+    animation: fadeIn 0.5s ease-out 0.2s both;
+  }
+  
+  .animate-in-delay-3 {
+    animation: fadeIn 0.5s ease-out 0.3s both;
+  }
+  
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    .card-gradient, .card-gradient-dark {
+      @apply p-6;
+    }
+    
+    .metric-card {
+      @apply p-4;
+    }
+  }
+  
+  /* Accessibility improvements */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-in,
+    .animate-in-delay-1,
+    .animate-in-delay-2,
+    .animate-in-delay-3,
+    .button-glow,
+    .slider::-webkit-slider-thumb,
+    .slider::-moz-range-thumb {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+  
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .glass, .glass-dark {
+      @apply bg-white dark:bg-gray-900 border-2;
+    }
+  }
 }

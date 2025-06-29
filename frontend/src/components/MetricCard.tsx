@@ -1,11 +1,12 @@
 import React from 'react';
-import { Info } from 'lucide-react';
+import { Info, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface MetricCardProps {
   title: string;
   value: string;
   explanation: string;
   trend?: 'up' | 'down' | 'neutral';
+  icon?: React.ReactNode;
 }
 
 export const MetricCard: React.FC<MetricCardProps> = ({
@@ -13,41 +14,73 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   value,
   explanation,
   trend = 'neutral',
+  icon,
 }) => {
   const [showTooltip, setShowTooltip] = React.useState(false);
   
   const getTrendColor = () => {
     switch (trend) {
       case 'up':
-        return 'text-green-600 dark:text-green-400';
+        return 'text-secondary-600 dark:text-secondary-400';
       case 'down':
         return 'text-red-600 dark:text-red-400';
       default:
-        return 'text-gray-600 dark:text-gray-400';
+        return 'text-primary-600 dark:text-primary-400';
+    }
+  };
+
+  const getTrendIcon = () => {
+    switch (trend) {
+      case 'up':
+        return <TrendingUp className="h-4 w-4" />;
+      case 'down':
+        return <TrendingDown className="h-4 w-4" />;
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {title}
-        </h3>
-        <div className="relative">
-          <Info
-            className="h-4 w-4 text-gray-400 cursor-help"
-            onMouseEnter={() => setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
-          />
-          {showTooltip && (
-            <div className="absolute bottom-6 right-0 bg-gray-900 text-white text-xs rounded py-2 px-3 whitespace-nowrap z-10 max-w-xs">
-              {explanation}
+    <div className="group card-gradient dark:card-gradient-dark rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-sm metric-card overflow-hidden animate-in hover:scale-105">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          {icon && (
+            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+              {icon}
             </div>
           )}
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+            {title}
+          </h3>
+        </div>
+        <div className="flex items-center space-x-2">
+          {trend !== 'neutral' && (
+            <div className={`p-1 rounded-full ${getTrendColor().replace('text-', 'bg-').replace('dark:text-', 'dark:bg-')}/20`}>
+              <div className={getTrendColor()}>
+                {getTrendIcon()}
+              </div>
+            </div>
+          )}
+          <div className="relative">
+            <Info
+              className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help transition-colors"
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+            />
+            {showTooltip && (
+              <div className="absolute bottom-6 right-0 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded-xl py-3 px-4 whitespace-nowrap z-20 max-w-xs shadow-lg border border-gray-700 animate-in">
+                <div className="absolute -bottom-1 right-3 w-2 h-2 bg-gray-900 dark:bg-gray-800 rotate-45 border-r border-b border-gray-700"></div>
+                {explanation}
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      <div className={`text-2xl font-bold ${getTrendColor()}`}>
+      <div className={`text-3xl font-bold ${getTrendColor()} mb-2`}>
         {value}
+      </div>
+      <div className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+        <div className={`h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full transition-all duration-1000 group-hover:from-primary-600 group-hover:to-secondary-600`} style={{ width: '75%' }}></div>
       </div>
     </div>
   );
