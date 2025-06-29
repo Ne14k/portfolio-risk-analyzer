@@ -15,10 +15,10 @@ A professional web application for analyzing investment portfolio risk and provi
 ## Screenshots
 
 ### Desktop View
-![Portfolio Risk Analyzer Interface](https://via.placeholder.com/800x600/3b82f6/ffffff?text=Portfolio+Risk+Analyzer)
+- Wait for better version
 
 ### Mobile View
-![Mobile Interface](https://via.placeholder.com/400x600/10b981/ffffff?text=Mobile+View)
+- Wait for better version
 
 ## Technology Stack
 
@@ -45,8 +45,8 @@ A professional web application for analyzing investment portfolio risk and provi
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Ne14k/demonstration_app.git
-cd demonstration_app
+git clone https://github.com/Ne14k/portfolio-risk-analyzer.git
+cd portfolio_risk_analyzer
 ```
 
 2. Install all dependencies:
@@ -82,25 +82,6 @@ The FastAPI backend provides interactive API documentation:
 - `POST /analyze` - Analyze portfolio and get optimization recommendations
 - `GET /asset-classes` - Get available asset classes with characteristics
 
-## Project Structure
-
-```
-portfolio-risk-analyzer/
-├── frontend/                 # React TypeScript frontend
-│   ├── src/
-│   │   ├── components/      # Reusable UI components
-│   │   ├── services/        # API client
-│   │   ├── types/           # TypeScript definitions
-│   │   └── App.tsx          # Main application component
-│   ├── public/              # Static assets
-│   └── package.json
-├── backend/                 # FastAPI Python backend
-│   ├── main.py             # FastAPI application
-│   └── requirements.txt    # Python dependencies
-├── package.json            # Root package.json for scripts
-└── README.md
-```
-
 ## Risk Metrics Explained
 
 ### Volatility
@@ -124,46 +105,13 @@ The optimization engine uses Modern Portfolio Theory to:
 - Maximize expected return for a given level of risk
 - Apply constraints based on risk tolerance preferences
 
-## Development
-
-### Frontend Development
-```bash
-cd frontend
-npm start              # Start development server
-npm run build          # Build for production
-npm test              # Run tests
-```
-
-### Backend Development
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload    # Start with auto-reload
-python -m pytest           # Run tests (when added)
-```
-
-### Environment Variables
-Create a `.env` file in the backend directory for configuration:
-```
-CORS_ORIGINS=http://localhost:3000
-DEBUG=true
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Disclaimer
 
-This application is for educational and demonstration purposes only. It should not be used as the sole basis for investment decisions. Always consult with qualified financial advisors before making investment decisions.
+This application is for learning and demonstration purposes only. It should not be used as the sole basis for any investment decisions. Always consult with qualified financial advisors before making any investment decisions.
 
 ## Acknowledgments
 
