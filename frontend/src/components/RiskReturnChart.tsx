@@ -243,25 +243,50 @@ export const RiskReturnChart: React.FC<RiskReturnChartProps> = ({
         </div>
       </div>
       
-      {/* Risk Education */}
-      <div className="mt-6 p-5 bg-gray-50 dark:bg-gray-800/20 rounded-xl border border-gray-200/50 dark:border-gray-800/50">
-        <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
-          <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
+      {/* Understanding Risk Container */}
+      <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 border border-gray-200/50 dark:border-gray-700/50">
+        <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">
           Understanding Risk
         </h4>
-        <div className="text-xs text-gray-700 dark:text-gray-300 space-y-2">
-          <p className="flex items-start">
-            <span className="font-semibold mr-1">📊</span>
-            <span><strong>Higher risk means bigger swings:</strong> A 15% risk portfolio could lose 15% in a typical bad year, or 30% in a really bad year.</span>
-          </p>
-          <p className="flex items-start">
-            <span className="font-semibold mr-1">💰</span>
-            <span><strong>Example:</strong> $100,000 at 10% risk → potential loss of $10,000-$20,000 during market downturns.</span>
-          </p>
-          <p className="flex items-start">
-            <span className="font-semibold mr-1">⚖️</span>
-            <span><strong>Trade-off:</strong> Higher risk usually means higher long-term returns, but more stress and potential short-term losses.</span>
-          </p>
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            {/* Risk Impact */}
+            <div className="p-4 rounded-xl border border-gray-300 dark:border-gray-600">
+              <div className="flex items-center mb-2">
+                <span className="text-lg mr-2">📊</span>
+                <h5 className="text-sm font-semibold text-amber-800 dark:text-amber-200">Risk Impact</h5>
+              </div>
+              <p className="text-xs text-amber-700 dark:text-amber-300 leading-relaxed">
+                <strong>Higher risk means bigger swings:</strong> A 15% risk portfolio could lose 15% in a typical bad year, or 30% in a really bad year.
+              </p>
+            </div>
+
+            {/* Real Example */}
+            <div className="p-4 rounded-xl border border-gray-300 dark:border-gray-600">
+              <div className="flex items-center mb-2">
+                <span className="text-lg mr-2">💰</span>
+                <h5 className="text-sm font-semibold text-green-800 dark:text-green-200">Real Example</h5>
+              </div>
+              <p className="text-xs text-green-700 dark:text-green-300 leading-relaxed">
+                <strong>$100,000 at 10% risk</strong> → potential loss of $10,000-$20,000 during market downturns.
+              </p>
+            </div>
+
+            {/* Risk-Return Trade-off */}
+            <div className="p-4 rounded-xl border border-gray-300 dark:border-gray-600">
+              <div className="flex items-center mb-2">
+                <span className="text-lg mr-2">⚖️</span>
+                <h5 className="text-sm font-semibold text-blue-800 dark:text-blue-200">Trade-off</h5>
+              </div>
+              <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+                <strong>Higher risk usually means higher long-term returns,</strong> but more stress and potential short-term losses.
+              </p>
+            </div>
+
+          </div>
+
+
         </div>
       </div>
     </div>

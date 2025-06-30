@@ -8,6 +8,7 @@ interface AllocationSliderProps {
   description: string;
   color: string;
   icon?: React.ReactNode;
+  remainingAllocation?: number;
 }
 
 export const AllocationSlider: React.FC<AllocationSliderProps> = ({
@@ -16,6 +17,7 @@ export const AllocationSlider: React.FC<AllocationSliderProps> = ({
   onChange,
   description,
   color,
+  remainingAllocation = 0,
 }) => {
   const [showTooltip, setShowTooltip] = React.useState(false);
   const [inputValue, setInputValue] = React.useState((value * 100).toFixed(1));
@@ -38,6 +40,19 @@ export const AllocationSlider: React.FC<AllocationSliderProps> = ({
   React.useEffect(() => {
     setInputValue((value * 100).toFixed(1));
   }, [value]);
+
+  const handleSliderClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const sliderWidth = rect.width;
+    const rawClickedValue = Math.max(0, Math.min(1, clickX / sliderWidth));
+    
+    // Round to nearest whole percent (0.01 increments)
+    const clickedValue = Math.round(rawClickedValue * 100) / 100;
+    
+    // Always set to clicked value, automatic rebalancing will handle constraints
+    onChange(clickedValue);
+  };
 
   return (
     <div className="space-y-4 p-4 rounded-xl bg-gray-50/50 dark:bg-gray-800/30 border border-gray-200/30 dark:border-gray-700/30 transition-all duration-200 hover:bg-gray-100/50 dark:hover:bg-gray-700/30">
@@ -75,14 +90,19 @@ export const AllocationSlider: React.FC<AllocationSliderProps> = ({
           <span className="text-sm font-medium text-gray-500 dark:text-gray-400">%</span>
         </div>
       </div>
-      <div className="relative">
+      <div className="relative" onClick={handleSliderClick}>
         <input
           type="range"
           min="0"
           max="1"
           step="0.01"
           value={value}
-          onChange={(e) => onChange(parseFloat(e.target.value))}
+          onChange={(e) => {
+            const rawValue = parseFloat(e.target.value);
+            // Round to nearest whole percent (0.01 increments)
+            const roundedValue = Math.round(rawValue * 100) / 100;
+            onChange(roundedValue);
+          }}
           className="w-full h-3 rounded-lg appearance-none cursor-pointer slider transition-all"
           style={{
             background: `linear-gradient(to right, ${color} 0%, ${color} ${value * 100}%, #e5e7eb ${value * 100}%, #e5e7eb 100%)`,
@@ -91,7 +111,6 @@ export const AllocationSlider: React.FC<AllocationSliderProps> = ({
       </div>
       <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
         <span>0%</span>
-        <span className="font-medium" style={{ color: color }}>{(value * 100).toFixed(1)}%</span>
         <span>100%</span>
       </div>
     </div>
