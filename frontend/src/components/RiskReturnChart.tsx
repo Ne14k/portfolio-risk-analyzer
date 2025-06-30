@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea } from 'recharts';
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea, Cell } from 'recharts';
 import { RiskMetrics } from '../types';
 
 interface RiskReturnChartProps {
@@ -16,13 +16,13 @@ export const RiskReturnChart: React.FC<RiskReturnChartProps> = ({
       name: 'Current Portfolio',
       risk: currentMetrics.volatility,
       return: currentMetrics.expected_return,
-      fill: '#ef4444',
+      fill: '#f59e0b',
     },
     {
       name: 'Optimized Portfolio',
       risk: optimizedMetrics.volatility,
       return: optimizedMetrics.expected_return,
-      fill: '#10b981',
+      fill: '#22c55e',
     },
   ];
 
@@ -92,25 +92,36 @@ export const RiskReturnChart: React.FC<RiskReturnChartProps> = ({
       };
 
       return (
-        <div className="bg-white dark:bg-gray-800 p-4 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-w-xs">
-          <p className="font-medium text-gray-800 dark:text-gray-200 mb-2">{data.name}</p>
-          <div className="space-y-1 text-sm">
-            <p className="text-gray-600 dark:text-gray-400">
-              Expected Return: <span className="font-medium text-green-600">{data.return.toFixed(1)}%</span>
-            </p>
-            <p className="text-gray-600 dark:text-gray-400">
-              Volatility: <span className="font-medium">{data.risk.toFixed(1)}%</span> ({getRiskDescription(data.risk)})
-            </p>
-            <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                <strong>Potential Impact:</strong>
+        <div className="bg-white dark:bg-gray-800 p-5 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl shadow-lg max-w-sm animate-in">
+          <p className="font-bold text-gray-900 dark:text-gray-100 mb-3 text-center">{data.name}</p>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <span className="text-gray-700 dark:text-gray-300">Expected Return:</span>
+              <span className="font-bold text-green-600 dark:text-green-400">{data.return.toFixed(1)}%</span>
+            </div>
+            <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/20 rounded-lg">
+              <span className="text-gray-700 dark:text-gray-300">Volatility:</span>
+              <span className="font-bold text-gray-600 dark:text-gray-400">{data.risk.toFixed(1)}%</span>
+            </div>
+            <div className="p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                Risk Level: <span className="text-primary-600 dark:text-primary-400">{getRiskDescription(data.risk)}</span>
               </p>
-              <p className="text-xs text-amber-600 dark:text-amber-400">
-                • Typical year loss: up to {getPotentialLoss(data.risk)}
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Potential Impact:
               </p>
-              <p className="text-xs text-red-600 dark:text-red-400">
-                • Bad year loss: up to {getWorstCaseLoss(data.risk)}
-              </p>
+              <div className="space-y-1">
+                <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center">
+                  <div className="w-2 h-2 bg-amber-500 rounded-full mr-2"></div>
+                  Typical loss: up to {getPotentialLoss(data.risk)}
+                </p>
+                <p className="text-xs text-red-600 dark:text-red-400 flex items-center">
+                  <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                  Worst case: up to {getWorstCaseLoss(data.risk)}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -120,16 +131,16 @@ export const RiskReturnChart: React.FC<RiskReturnChartProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">
+    <div className="card-gradient dark:card-gradient-dark rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-sm animate-in">
+      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
         Risk vs Return Analysis
       </h3>
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={450}>
         <ScatterChart 
           data={data}
-          margin={{ top: 20, right: 30, bottom: 50, left: 50 }}
+          margin={{ top: 20, right: 30, bottom: 60, left: 60 }}
         >
-          <CartesianGrid strokeDasharray="3 3" className="stroke-gray-300 dark:stroke-gray-600" />
+          <CartesianGrid strokeDasharray="3 3" className="stroke-gray-300/60 dark:stroke-gray-600/60" strokeWidth={1} />
           
           {/* Risk zones background */}
           <ReferenceArea
@@ -194,47 +205,63 @@ export const RiskReturnChart: React.FC<RiskReturnChartProps> = ({
           <Tooltip content={<CustomTooltip />} />
           <Scatter 
             data={data} 
-            fill="#8884d8"
-          />
+            r={8}
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.fill} />
+            ))}
+          </Scatter>
         </ScatterChart>
       </ResponsiveContainer>
       <div className="mt-4 space-y-3">
         {/* Portfolio Legend */}
-        <div className="flex justify-center space-x-6">
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Current</span>
+        <div className="flex justify-center space-x-8">
+          <div className="flex items-center p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200/50 dark:border-amber-700/50">
+            <div className="w-4 h-4 bg-amber-500 rounded-full mr-3 shadow-lg"></div>
+            <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Current Portfolio</span>
           </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">Optimized</span>
+          <div className="flex items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200/50 dark:border-green-700/50">
+            <div className="w-4 h-4 bg-green-500 rounded-full mr-3 shadow-lg"></div>
+            <span className="text-sm font-medium text-green-700 dark:text-green-300">Optimized Portfolio</span>
           </div>
         </div>
         
         {/* Risk Zone Legend */}
-        <div className="flex justify-center space-x-4">
+        <div className="flex justify-center space-x-6">
           <div className="flex items-center">
-            <div className="w-4 h-3 bg-green-500 bg-opacity-20 border border-green-300 mr-1"></div>
-            <span className="text-xs text-gray-500 dark:text-gray-400">Low Risk (0-10%)</span>
+            <div className="w-5 h-3 bg-green-400/30 border border-green-400/50 rounded mr-2"></div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Low Risk (0-10%)</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-3 bg-amber-500 bg-opacity-20 border border-amber-300 mr-1"></div>
-            <span className="text-xs text-gray-500 dark:text-gray-400">Moderate (10-20%)</span>
+            <div className="w-5 h-3 bg-amber-400/30 border border-amber-400/50 rounded mr-2"></div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Moderate (10-20%)</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-3 bg-red-500 bg-opacity-20 border border-red-300 mr-1"></div>
-            <span className="text-xs text-gray-500 dark:text-gray-400">High Risk (20%+)</span>
+            <div className="w-5 h-3 bg-red-400/30 border border-red-400/50 rounded mr-2"></div>
+            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">High Risk (20%+)</span>
           </div>
         </div>
       </div>
       
       {/* Risk Education */}
-      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-        <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Understanding Risk</h4>
-        <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
-          <p><strong>Higher risk means bigger swings:</strong> A 15% risk portfolio could lose 15% in a typical bad year, or 30% in a really bad year.</p>
-          <p><strong>Example:</strong> $100,000 at 10% risk → potential loss of $10,000-$20,000 during market downturns.</p>
-          <p><strong>Trade-off:</strong> Higher risk usually means higher long-term returns, but more stress and potential short-term losses.</p>
+      <div className="mt-6 p-5 bg-gray-50 dark:bg-gray-800/20 rounded-xl border border-gray-200/50 dark:border-gray-800/50">
+        <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
+          <div className="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
+          Understanding Risk
+        </h4>
+        <div className="text-xs text-gray-700 dark:text-gray-300 space-y-2">
+          <p className="flex items-start">
+            <span className="font-semibold mr-1">📊</span>
+            <span><strong>Higher risk means bigger swings:</strong> A 15% risk portfolio could lose 15% in a typical bad year, or 30% in a really bad year.</span>
+          </p>
+          <p className="flex items-start">
+            <span className="font-semibold mr-1">💰</span>
+            <span><strong>Example:</strong> $100,000 at 10% risk → potential loss of $10,000-$20,000 during market downturns.</span>
+          </p>
+          <p className="flex items-start">
+            <span className="font-semibold mr-1">⚖️</span>
+            <span><strong>Trade-off:</strong> Higher risk usually means higher long-term returns, but more stress and potential short-term losses.</span>
+          </p>
         </div>
       </div>
     </div>
