@@ -41,7 +41,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   };
 
   return (
-    <div className="group card-gradient dark:card-gradient-dark rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-sm metric-card overflow-hidden animate-in hover:scale-105">
+    <div className="group bg-white dark:bg-gray-800 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 border border-gray-200/50 dark:border-gray-700/50 metric-card animate-in hover:scale-105 relative">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           {icon && (
@@ -68,8 +68,14 @@ export const MetricCard: React.FC<MetricCardProps> = ({
               onMouseLeave={() => setShowTooltip(false)}
             />
             {showTooltip && (
-              <div className="absolute bottom-6 right-0 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded-xl py-3 px-4 whitespace-nowrap z-20 max-w-xs shadow-lg border border-gray-700 animate-in">
-                <div className="absolute -bottom-1 right-3 w-2 h-2 bg-gray-900 dark:bg-gray-800 rotate-45 border-r border-b border-gray-700"></div>
+              <div className="fixed bg-gray-900 dark:bg-gray-800 text-white text-sm rounded-xl py-4 px-6 w-80 shadow-2xl border border-gray-700 z-[9999]"
+                style={{ 
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  whiteSpace: 'normal',
+                  lineHeight: '1.5'
+                }}>
                 {explanation}
               </div>
             )}
@@ -78,9 +84,6 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       </div>
       <div className={`text-3xl font-bold ${getTrendColor()} mb-2`}>
         {value}
-      </div>
-      <div className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-        <div className={`h-full bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full transition-all duration-1000 group-hover:from-primary-600 group-hover:to-secondary-600`} style={{ width: '75%' }}></div>
       </div>
     </div>
   );

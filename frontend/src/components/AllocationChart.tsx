@@ -129,12 +129,14 @@ export const AllocationChart: React.FC<AllocationChartProps> = ({ allocation, ti
           <Tooltip 
             formatter={(value: number) => [`${value.toFixed(1)}%`, 'Allocation']}
             contentStyle={{
-              backgroundColor: 'rgba(0,0,0,0.8)',
-              border: 'none',
+              backgroundColor: 'rgba(156, 163, 175, 0.85)', // Light grey with transparency
+              border: '1px solid rgba(156, 163, 175, 0.3)',
               borderRadius: '12px',
-              color: 'white',
+              color: '#1f2937', // Dark text for better contrast
               fontSize: '14px',
-              fontWeight: '500',
+              fontWeight: '600',
+              backdropFilter: 'blur(8px)',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
             }}
           />
           <Legend 
