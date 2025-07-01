@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, MessageCircle, ChevronDown, ChevronUp, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Brain, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { PortfolioAllocation, RiskMetrics, ESGPreferences, TaxPreferences, SectorPreferences } from '../types';
 
 interface AIRiskExplanationProps {
@@ -42,10 +42,11 @@ const generatePortfolioScore = (
   const cashWeight = allocation.cash * 100;
   
   // 1. Risk-Adjusted Return Efficiency (25 points max)
+  // Adjusted for more realistic Sharpe ratio expectations (1.5 = excellent)
   const sharpeScore = Math.min(25, Math.max(0, 
     metrics.sharpe_ratio < 0 ? 0 :
-    metrics.sharpe_ratio > 2.5 ? 25 :
-    (metrics.sharpe_ratio / 2.5) * 25
+    metrics.sharpe_ratio > 1.5 ? 25 :
+    (metrics.sharpe_ratio / 1.5) * 25
   ));
   score += sharpeScore;
   
@@ -53,30 +54,31 @@ const generatePortfolioScore = (
   else if (sharpeScore > 20) explanationFactors.push("Excellent risk efficiency");
   
   // 2. Risk Tolerance Alignment (20 points max)
+  // Adjusted for more realistic risk tolerance ranges
   let riskAlignmentScore = 0;
   if (riskTolerance === 'low') {
-    if (stockWeight <= 30) riskAlignmentScore = 20;
-    else if (stockWeight <= 50) riskAlignmentScore = 15;
-    else if (stockWeight <= 70) riskAlignmentScore = 8;
-    else riskAlignmentScore = 2;
-    
-    if (bondWeight >= 50) riskAlignmentScore += 3;
-    if (cashWeight >= 10) riskAlignmentScore += 2;
-  } else if (riskTolerance === 'medium') {
-    if (stockWeight >= 40 && stockWeight <= 75) riskAlignmentScore = 20;
-    else if (stockWeight >= 30 && stockWeight <= 85) riskAlignmentScore = 15;
-    else if (stockWeight >= 20 && stockWeight <= 90) riskAlignmentScore = 10;
+    if (stockWeight <= 40) riskAlignmentScore = 20;  // More realistic for conservative investors
+    else if (stockWeight <= 60) riskAlignmentScore = 15;
+    else if (stockWeight <= 75) riskAlignmentScore = 10;
     else riskAlignmentScore = 5;
     
-    if (bondWeight >= 15 && bondWeight <= 50) riskAlignmentScore += 2;
-  } else { // high
-    if (stockWeight >= 70) riskAlignmentScore = 20;
-    else if (stockWeight >= 60) riskAlignmentScore = 15;
-    else if (stockWeight >= 45) riskAlignmentScore = 10;
-    else riskAlignmentScore = 3;
+    if (bondWeight >= 40) riskAlignmentScore += 2;  // Reduced bonus threshold
+    if (cashWeight >= 5) riskAlignmentScore += 1;   // More reasonable cash expectation
+  } else if (riskTolerance === 'medium') {
+    if (stockWeight >= 35 && stockWeight <= 80) riskAlignmentScore = 20;  // Wider acceptable range
+    else if (stockWeight >= 25 && stockWeight <= 90) riskAlignmentScore = 15;
+    else if (stockWeight >= 15 && stockWeight <= 95) riskAlignmentScore = 10;
+    else riskAlignmentScore = 7;  // Less harsh penalty
     
-    if (altWeight >= 10) riskAlignmentScore += 3;
-    if (cashWeight <= 5) riskAlignmentScore += 2;
+    if (bondWeight >= 10 && bondWeight <= 55) riskAlignmentScore += 2;
+  } else { // high
+    if (stockWeight >= 65) riskAlignmentScore = 20;  // Slightly more lenient
+    else if (stockWeight >= 55) riskAlignmentScore = 16;
+    else if (stockWeight >= 40) riskAlignmentScore = 12;
+    else riskAlignmentScore = 6;  // Less harsh for lower allocations
+    
+    if (altWeight >= 8) riskAlignmentScore += 2;  // Slightly lower threshold
+    if (cashWeight <= 8) riskAlignmentScore += 1;  // More realistic cash tolerance
   }
   score += riskAlignmentScore;
   
@@ -108,16 +110,17 @@ const generatePortfolioScore = (
   if (diversificationScore < 8) explanationFactors.push("Poor diversification");
   
   // 5. Cash Drag Analysis (10 points max)
+  // More reasonable cash allocation scoring
   let cashScore = 10;
-  if (cashWeight > 25) cashScore = 2;
-  else if (cashWeight > 15) cashScore = 5;
-  else if (cashWeight > 10) cashScore = 7;
-  else if (cashWeight > 5) cashScore = 9;
-  else if (cashWeight >= 2) cashScore = 10;
-  else cashScore = 8; // Some cash is good
+  if (cashWeight > 30) cashScore = 3;      // Only heavily penalize very high cash
+  else if (cashWeight > 20) cashScore = 7; // More lenient for 20-30% cash
+  else if (cashWeight > 12) cashScore = 9; // Minor penalty for 12-20%
+  else if (cashWeight > 3) cashScore = 10; // Optimal range 3-12%
+  else if (cashWeight >= 1) cashScore = 9; // Small penalty for very low cash
+  else cashScore = 7; // Some cash is important for liquidity
   score += cashScore;
   
-  if (cashWeight > 15) explanationFactors.push("Excessive cash drag");
+  if (cashWeight > 20) explanationFactors.push("High cash allocation reducing returns");
   
   // 6. Advanced Preferences (15 points max)
   let advancedScore = 0;
@@ -167,17 +170,18 @@ const generatePortfolioScore = (
   }
   
   // Final adjustments based on extreme portfolios
+  // More balanced penalties for concentration
   if (stockWeight === 100) {
-    score -= 8;
-    explanationFactors.push("Excessive concentration risk");
+    score -= 6;  // Reduced penalty - some investors prefer 100% stocks
+    explanationFactors.push("High concentration risk - consider diversification");
   }
   if (bondWeight === 100) {
-    score -= 5;
-    explanationFactors.push("No growth potential");
+    score -= 4;  // Consistent penalty scaling
+    explanationFactors.push("Conservative approach - consider some growth assets");
   }
   if (cashWeight === 100) {
-    score -= 15;
-    explanationFactors.push("No investment growth");
+    score -= 12; // Still significant but less harsh
+    explanationFactors.push("Missing investment growth opportunities");
   }
   
   // Ensure score is realistic and whole number
@@ -189,31 +193,32 @@ const generatePortfolioScore = (
   let bgColor: string;
   let explanation: string;
   
-  if (score >= 85) {
+  // More achievable grade thresholds
+  if (score >= 80) {
     grade = 'A';
     color = 'text-green-700 dark:text-green-300';
     bgColor = 'bg-green-100 dark:bg-green-900/30';
-    explanation = 'Exceptional portfolio demonstrating sophisticated understanding of risk management, diversification, and goal alignment.';
-  } else if (score >= 75) {
+    explanation = 'Excellent portfolio with strong fundamentals and effective risk management. Well-aligned with goals and preferences.';
+  } else if (score >= 70) {
     grade = 'B';
     color = 'text-green-600 dark:text-green-400';
     bgColor = 'bg-green-50 dark:bg-green-900/20';
-    explanation = 'Strong portfolio with good fundamentals and minor optimization opportunities.';
-  } else if (score >= 65) {
+    explanation = 'Good portfolio with solid structure and minor areas for optimization. Shows thoughtful asset allocation.';
+  } else if (score >= 60) {
     grade = 'C';
     color = 'text-yellow-600 dark:text-yellow-400';
     bgColor = 'bg-yellow-50 dark:bg-yellow-900/20';
-    explanation = 'Decent portfolio with several areas for meaningful improvement.';
-  } else if (score >= 50) {
+    explanation = 'Adequate portfolio with room for improvement. Consider rebalancing for better risk-adjusted returns.';
+  } else if (score >= 45) {
     grade = 'D';
     color = 'text-orange-600 dark:text-orange-400';
     bgColor = 'bg-orange-50 dark:bg-orange-900/20';
-    explanation = 'Suboptimal portfolio requiring significant restructuring for better risk-adjusted returns.';
+    explanation = 'Below-average portfolio that would benefit from restructuring to better align with goals and risk tolerance.';
   } else {
     grade = 'F';
     color = 'text-red-600 dark:text-red-400';
     bgColor = 'bg-red-50 dark:bg-red-900/20';
-    explanation = 'Problematic portfolio with fundamental issues that could severely impact long-term wealth building.';
+    explanation = 'Portfolio structure has significant issues that may hinder long-term financial goals. Consider professional guidance.';
   }
   
   return { score, grade, color, bgColor, explanation };
@@ -398,9 +403,6 @@ export const AIRiskExplanation: React.FC<AIRiskExplanationProps> = ({
     setExpandedQuestions(newExpanded);
   };
   
-  const ScoreIcon = portfolioScore.score >= 70 ? CheckCircle : 
-                   portfolioScore.score >= 55 ? AlertTriangle : 
-                   TrendingUp;
   
   return (
     <div className="space-y-4">
@@ -421,16 +423,13 @@ export const AIRiskExplanation: React.FC<AIRiskExplanationProps> = ({
             </div>
           </div>
           
-          <div className="flex items-center space-x-3">
-            <div className="text-right">
-              <div className={`text-3xl font-bold ${portfolioScore.color}`}>
-                {portfolioScore.score}
-              </div>
-              <div className={`text-sm font-medium ${portfolioScore.color}`}>
-                Grade: {portfolioScore.grade}
-              </div>
+          <div className="text-right">
+            <div className={`text-3xl font-bold ${portfolioScore.color}`}>
+              {portfolioScore.score}
             </div>
-            <ScoreIcon className={`h-8 w-8 ${portfolioScore.color}`} />
+            <div className={`text-sm font-medium ${portfolioScore.color}`}>
+              Grade: {portfolioScore.grade}
+            </div>
           </div>
         </div>
         

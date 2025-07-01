@@ -8,7 +8,7 @@ import { MetricCard } from './components/MetricCard';
 import { AllocationChart } from './components/AllocationChart';
 import { ComparisonChart } from './components/ComparisonChart';
 import { RiskReturnChart } from './components/RiskReturnChart';
-import { TrendingUp, Shield, Target, BarChart3, BookOpen, Zap, ArrowRight, ChevronDown, ChevronUp, Settings, Sparkles, Trash2 } from 'lucide-react';
+import { TrendingUp, Shield, Target, BarChart3, BookOpen, Zap, ArrowRight, ChevronDown, ChevronUp, Settings, Trash2 } from 'lucide-react';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { EducationalDropdown } from './components/EducationalDropdown';
 import { AIRiskExplanation } from './components/AIRiskExplanation';
@@ -68,7 +68,6 @@ function App() {
     max_sector_concentration: 0.3
   });
   
-  const [useAIOptimization, setUseAIOptimization] = useState(true);
 
   useEffect(() => {
     if (isDark) {
@@ -102,7 +101,7 @@ function App() {
     
     setResult(null);
     setError(null);
-  }, [riskTolerance, targetReturn, optimizationGoal, esgPreferences, taxPreferences, sectorPreferences, useAIOptimization]);
+  }, [riskTolerance, targetReturn, optimizationGoal, esgPreferences, taxPreferences, sectorPreferences]);
 
   // Memoized allocation total to prevent unnecessary recalculations
   const allocationTotal = useMemo(() => 
@@ -215,7 +214,7 @@ function App() {
         esg_preferences: showAdvancedOptions ? esgPreferences : undefined,
         tax_preferences: showAdvancedOptions ? taxPreferences : undefined,
         sector_preferences: showAdvancedOptions ? sectorPreferences : undefined,
-        use_ai_optimization: useAIOptimization,
+        use_ai_optimization: true,
       };
 
       console.log('Starting portfolio analysis with:', portfolioInput);
@@ -444,25 +443,6 @@ function App() {
                   </div>
                 </div>
 
-                {/* AI Optimization Toggle */}
-                <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <div className="flex items-center space-x-3">
-                    <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <div>
-                      <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100">AI-Powered Optimization</h4>
-                      <p className="text-xs text-blue-700 dark:text-blue-300">Use advanced AI algorithms to find optimal allocations</p>
-                    </div>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={useAIOptimization}
-                      onChange={(e) => setUseAIOptimization(e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
 
                 {/* Advanced Options */}
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
@@ -681,7 +661,7 @@ function App() {
                       esgPreferences={showAdvancedOptions ? esgPreferences : undefined}
                       taxPreferences={showAdvancedOptions ? taxPreferences : undefined}
                       sectorPreferences={showAdvancedOptions ? sectorPreferences : undefined}
-                      useAIOptimization={useAIOptimization}
+                      useAIOptimization={true}
                     />
                   </div>
                   
@@ -798,6 +778,19 @@ function App() {
           )}
         </div>
       </div>
+      
+      {/* Footer */}
+      <footer className="mt-16 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+          <div className="text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+              <strong>Disclaimer:</strong> This application is for learning and demonstration purposes only. 
+              It should not be used as the sole basis for any investment decisions. 
+              Always consult with qualified financial advisors before making any investment decisions.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
