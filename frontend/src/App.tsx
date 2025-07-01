@@ -5,7 +5,7 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { AllocationSlider } from './components/AllocationSlider';
 import { AlternativesSelector } from './components/AlternativesSelector';
 import { MetricCard } from './components/MetricCard';
-import { AllocationChart } from './components/AllocationChart';
+// import { AllocationChart } from './components/AllocationChart';
 import { ComparisonChart } from './components/ComparisonChart';
 import { RiskReturnChart } from './components/RiskReturnChart';
 import { TrendingUp, Shield, Target, BarChart3, BookOpen, Zap, ArrowRight, ChevronDown, ChevronUp, Settings, Trash2 } from 'lucide-react';
@@ -134,25 +134,25 @@ function App() {
   }, []);
 
   // Memoized normalization function
-  const normalizeAllocation = useCallback(() => {
-    setAllocation(prev => {
-      const total = Object.values(prev).reduce((sum, val) => sum + val, 0);
-      if (total > 0 && Math.abs(total - 1.0) > 0.01) {
-        return Object.entries(prev).reduce(
-          (acc, [key, value]) => ({
-            ...acc,
-            [key]: value / total,
-          }),
-          {} as PortfolioAllocation
-        );
-      }
-      return prev;
-    });
+  // const normalizeAllocation = useCallback(() => {
+  //   setAllocation(prev => {
+  //     const total = Object.values(prev).reduce((sum, val) => sum + val, 0);
+  //     if (total > 0 && Math.abs(total - 1.0) > 0.01) {
+  //       return Object.entries(prev).reduce(
+  //         (acc, [key, value]) => ({
+  //           ...acc,
+  //           [key]: value / total,
+  //         }),
+  //         {} as PortfolioAllocation
+  //       );
+  //     }
+  //     return prev;
+  //   });
     
-    // Clear results when allocation is normalized
-    setResult(null);
-    setError(null);
-  }, []);
+  //   // Clear results when allocation is normalized
+  //   setResult(null);
+  //   setError(null);
+  // }, []);
 
   // Apply preset allocation
   const applyPreset = useCallback((presetKey: keyof typeof PRESET_ALLOCATIONS) => {
@@ -229,7 +229,7 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [allocation, allocationTotal, riskTolerance, targetReturn, optimizationGoal, loading]);
+  }, [allocation, allocationTotal, riskTolerance, targetReturn, optimizationGoal, loading, esgPreferences, sectorPreferences, showAdvancedOptions, taxPreferences]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-all duration-150">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Settings, TrendingUp, Trash2 } from 'lucide-react';
+import { Settings, Trash2 } from 'lucide-react';
 
 interface AlternativesBreakdown {
   crypto: number;
@@ -23,12 +23,12 @@ const PRESET_ALTERNATIVES = {
   techFocused: { crypto: 0.6, reits: 0.2, commodities: 0.1, privateEquity: 0.1 },
 };
 
-const ALTERNATIVE_DESCRIPTIONS = {
-  crypto: "Digital assets like Bitcoin and Ethereum for growth potential",
-  reits: "Real Estate Investment Trusts for income and inflation protection",
-  commodities: "Physical assets like gold, oil, and agricultural products",
-  privateEquity: "Private market investments for long-term growth"
-};
+// const ALTERNATIVE_DESCRIPTIONS = {
+//   crypto: "Digital assets like Bitcoin and Ethereum for growth potential",
+//   reits: "Real Estate Investment Trusts for income and inflation protection",
+//   commodities: "Physical assets like gold, oil, and agricultural products",
+//   privateEquity: "Private market investments for long-term growth"
+// };
 
 export const AlternativesSelector: React.FC<AlternativesSelectorProps> = ({
   value,
@@ -38,19 +38,19 @@ export const AlternativesSelector: React.FC<AlternativesSelectorProps> = ({
   remainingAllocation = 0,
 }) => {
   const [isCustom, setIsCustom] = useState(false);
-  const [selectedPreset, setSelectedPreset] = useState<keyof typeof PRESET_ALTERNATIVES>('balanced');
+  const [selectedPreset] = useState<keyof typeof PRESET_ALTERNATIVES>('balanced');
   const [customBreakdown, setCustomBreakdown] = useState<AlternativesBreakdown>({
     crypto: 0.3,
     reits: 0.4,
     commodities: 0.2,
     privateEquity: 0.1,
   });
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Calculate total value from breakdown
-  const calculateTotalFromBreakdown = (breakdown: AlternativesBreakdown) => {
-    return Object.values(breakdown).reduce((sum, val) => sum + val, 0) * value;
-  };
+  // const calculateTotalFromBreakdown = (breakdown: AlternativesBreakdown) => {
+  //   return Object.values(breakdown).reduce((sum, val) => sum + val, 0) * value;
+  // };
 
   // Update breakdown when preset changes
   useEffect(() => {
@@ -74,7 +74,7 @@ export const AlternativesSelector: React.FC<AlternativesSelectorProps> = ({
         }));
       }
     }
-  }, [value, isCustom]);
+  }, [value, isCustom, customBreakdown]);
 
   const handleCustomBreakdownChange = (asset: keyof AlternativesBreakdown, newValue: number) => {
     setCustomBreakdown(prev => {
@@ -94,20 +94,20 @@ export const AlternativesSelector: React.FC<AlternativesSelectorProps> = ({
     });
   };
 
-  const normalizeBreakdown = () => {
-    const total = Object.values(customBreakdown).reduce((sum, val) => sum + val, 0);
-    if (total > 0 && Math.abs(total - 1.0) > 0.01) {
-      setCustomBreakdown(prev => 
-        Object.entries(prev).reduce(
-          (acc, [key, val]) => ({
-            ...acc,
-            [key]: val / total,
-          }),
-          {} as AlternativesBreakdown
-        )
-      );
-    }
-  };
+  // const normalizeBreakdown = () => {
+  //   const total = Object.values(customBreakdown).reduce((sum, val) => sum + val, 0);
+  //   if (total > 0 && Math.abs(total - 1.0) > 0.01) {
+  //     setCustomBreakdown(prev => 
+  //       Object.entries(prev).reduce(
+  //         (acc, [key, val]) => ({
+  //           ...acc,
+  //           [key]: val / total,
+  //         }),
+  //         {} as AlternativesBreakdown
+  //       )
+  //     );
+  //   }
+  // };
 
   const resetBreakdown = () => {
     setCustomBreakdown({
