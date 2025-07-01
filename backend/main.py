@@ -14,13 +14,8 @@ app = FastAPI(title="Portfolio Risk Analyzer API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000", 
-        "http://127.0.0.1:3000",
-        "https://portfolio-risk-analyzer-orcin.vercel.app",
-        "https://portfolio-risk-analyzer-production.up.railway.app"
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins for now to debug
+    allow_credentials=False,  # Must be False when using allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )
