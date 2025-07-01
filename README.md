@@ -1,6 +1,6 @@
 # Portfolio Risk Analyzer
 
-A professional web application for analyzing investment portfolio risk and providing intelligent optimization recommendations using Modern Portfolio Theory.
+A professional AI-powered web application for analyzing investment portfolio risk and providing intelligent optimization recommendations using Modern Portfolio Theory.
 
 ## Features
 
