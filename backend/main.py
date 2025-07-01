@@ -18,7 +18,6 @@ app.add_middleware(
         "http://localhost:3000", 
         "http://127.0.0.1:3000",
         "https://portfolio-risk-analyzer-orcin.vercel.app",
-        "https://portfolio-risk-analyzer-*.vercel.app",  # Allow preview deployments
         "https://portfolio-risk-analyzer-production.up.railway.app"
     ],
     allow_credentials=True,
@@ -976,4 +975,6 @@ async def get_asset_classes():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
