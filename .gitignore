@@ -1,10 +1,6 @@
-# Claude-related files and folders (keep local, exclude from git)
-CLAUDE.md
-.claude/
-.claude-*
-claude-*
-*claude*
-.anthropic/
+# Development files
+.vscode/
+.idea/
 
 # Dependencies
 node_modules/

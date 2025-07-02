@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceArea, Cell } from 'recharts';
 import { RiskMetrics } from '../types';
 
@@ -7,11 +7,11 @@ interface RiskReturnChartProps {
   optimizedMetrics: RiskMetrics;
 }
 
-export const RiskReturnChart: React.FC<RiskReturnChartProps> = ({
+export const RiskReturnChart = React.memo<RiskReturnChartProps>(({
   currentMetrics,
   optimizedMetrics,
 }) => {
-  const data = [
+  const data = useMemo(() => [
     {
       name: 'Current Portfolio',
       risk: currentMetrics.volatility,
@@ -24,7 +24,7 @@ export const RiskReturnChart: React.FC<RiskReturnChartProps> = ({
       return: optimizedMetrics.expected_return,
       fill: '#22c55e',
     },
-  ];
+  ], [currentMetrics, optimizedMetrics]);
 
   // Calculate normalized chart domains with proper intervals
   const allRisks = data.map(d => d.risk);
@@ -291,4 +291,4 @@ export const RiskReturnChart: React.FC<RiskReturnChartProps> = ({
       </div>
     </div>
   );
-};
+});

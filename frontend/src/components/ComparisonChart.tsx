@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { PortfolioAllocation } from '../types';
 
@@ -21,13 +21,13 @@ const GRADIENTS = {
   cash: 'url(#cashGradient)',
 };
 
-export const ComparisonChart: React.FC<ComparisonChartProps> = ({ 
+export const ComparisonChart = React.memo<ComparisonChartProps>(({ 
   currentAllocation, 
   optimizedAllocation 
 }) => {
   const [activeView, setActiveView] = useState<'current' | 'optimized'>('current');
 
-  const formatData = (allocation: PortfolioAllocation) => [
+  const formatData = useCallback((allocation: PortfolioAllocation) => [
     {
       name: 'Stocks',
       value: allocation.stocks * 100,
@@ -48,12 +48,12 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
       value: allocation.cash * 100,
       color: COLORS.cash,
     },
-  ].filter(item => item.value > 0);
+  ].filter(item => item.value > 0), []);
 
-  const currentData = formatData(currentAllocation);
-  const optimizedData = formatData(optimizedAllocation);
+  const currentData = useMemo(() => formatData(currentAllocation), [currentAllocation, formatData]);
+  const optimizedData = useMemo(() => formatData(optimizedAllocation), [optimizedAllocation, formatData]);
 
-  const renderCustomizedLabel = ({
+  const renderCustomizedLabel = useCallback(({
     cx,
     cy,
     midAngle,
@@ -84,9 +84,9 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
         {`${(percent * 100).toFixed(0)}%`}
       </text>
     );
-  };
+  }, []);
 
-  const getChangeIndicator = (current: number, optimized: number) => {
+  const getChangeIndicator = useCallback((current: number, optimized: number) => {
     const diff = optimized - current;
     if (Math.abs(diff) < 0.5) return null;
     
@@ -97,7 +97,7 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
         {diff > 0 ? '+' : ''}{diff.toFixed(1)}%
       </span>
     );
-  };
+  }, []);
 
   return (
     <div className="card-gradient dark:card-gradient-dark rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 border border-gray-200/50 dark:border-gray-700/50 animate-in">
@@ -265,4 +265,4 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({
       </div>
     </div>
   );
-};
+});

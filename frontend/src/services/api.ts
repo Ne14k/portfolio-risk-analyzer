@@ -5,11 +5,16 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // 30 second timeout
+  timeout: 15000, // Reduced from 30s to 15s for better UX
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Cache for API responses to prevent duplicate requests
+const cache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const pendingRequests = new Map<string, Promise<any>>();
 
 // Add response interceptor for error handling and retries
 api.interceptors.response.use(
@@ -41,19 +46,48 @@ api.interceptors.response.use(
 );
 
 export const analyzePortfolio = async (portfolio: PortfolioInput): Promise<OptimizationResult> => {
-  try {
-    console.log('Sending portfolio analysis request:', portfolio);
-    const response = await api.post<OptimizationResult>('/analyze', portfolio);
-    console.log('Portfolio analysis response:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Portfolio analysis error:', error);
-    throw new Error(
-      error instanceof Error 
-        ? `Analysis failed: ${error.message}` 
-        : 'Portfolio analysis failed. Please try again.'
-    );
+  const cacheKey = `analyze_${JSON.stringify(portfolio)}`;
+  
+  // Check cache first
+  const cached = cache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    console.log('Returning cached portfolio analysis result');
+    return cached.data;
   }
+  
+  // Check if the same request is already pending to prevent duplicates
+  if (pendingRequests.has(cacheKey)) {
+    console.log('Returning pending portfolio analysis request');
+    return pendingRequests.get(cacheKey)!;
+  }
+  
+  const requestPromise = (async () => {
+    try {
+      console.log('Sending portfolio analysis request:', portfolio);
+      const response = await api.post<OptimizationResult>('/analyze', portfolio);
+      console.log('Portfolio analysis response:', response.data);
+      
+      // Cache the result
+      cache.set(cacheKey, { data: response.data, timestamp: Date.now() });
+      
+      return response.data;
+    } catch (error) {
+      console.error('Portfolio analysis error:', error);
+      throw new Error(
+        error instanceof Error 
+          ? `Analysis failed: ${error.message}` 
+          : 'Portfolio analysis failed. Please try again.'
+      );
+    } finally {
+      // Clean up pending request
+      pendingRequests.delete(cacheKey);
+    }
+  })();
+  
+  // Store the pending request
+  pendingRequests.set(cacheKey, requestPromise);
+  
+  return requestPromise;
 };
 
 export const getAssetClasses = async (): Promise<{ asset_classes: AssetClass[] }> => {

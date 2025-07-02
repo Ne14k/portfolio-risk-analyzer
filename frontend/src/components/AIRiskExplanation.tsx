@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Brain, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { PortfolioAllocation, RiskMetrics, ESGPreferences, TaxPreferences, SectorPreferences } from '../types';
 
@@ -357,7 +357,7 @@ const getCommonQuestions = (
   return questions.slice(0, 3); // Return top 3 most relevant questions
 };
 
-export const AIRiskExplanation: React.FC<AIRiskExplanationProps> = ({
+export const AIRiskExplanation = React.memo<AIRiskExplanationProps>(({
   allocation,
   metrics,
   riskTolerance,
@@ -370,7 +370,7 @@ export const AIRiskExplanation: React.FC<AIRiskExplanationProps> = ({
 }) => {
   const [expandedQuestions, setExpandedQuestions] = useState<Set<number>>(new Set());
   
-  const portfolioScore = generatePortfolioScore(
+  const portfolioScore = useMemo(() => generatePortfolioScore(
     allocation, 
     metrics, 
     riskTolerance, 
@@ -380,8 +380,9 @@ export const AIRiskExplanation: React.FC<AIRiskExplanationProps> = ({
     taxPreferences,
     sectorPreferences,
     useAIOptimization
-  );
-  const plainEnglishExplanation = generatePlainEnglishExplanation(
+  ), [allocation, metrics, riskTolerance, optimizationGoal, targetReturn, esgPreferences, taxPreferences, sectorPreferences, useAIOptimization]);
+  
+  const plainEnglishExplanation = useMemo(() => generatePlainEnglishExplanation(
     allocation, 
     metrics, 
     riskTolerance, 
@@ -390,8 +391,9 @@ export const AIRiskExplanation: React.FC<AIRiskExplanationProps> = ({
     esgPreferences,
     taxPreferences,
     sectorPreferences
-  );
-  const commonQuestions = getCommonQuestions(allocation, metrics);
+  ), [allocation, metrics, riskTolerance, optimizationGoal, targetReturn, esgPreferences, taxPreferences, sectorPreferences]);
+  
+  const commonQuestions = useMemo(() => getCommonQuestions(allocation, metrics), [allocation, metrics]);
   
   const toggleQuestion = (index: number) => {
     const newExpanded = new Set(expandedQuestions);
@@ -496,4 +498,4 @@ export const AIRiskExplanation: React.FC<AIRiskExplanationProps> = ({
       )}
     </div>
   );
-};
+});

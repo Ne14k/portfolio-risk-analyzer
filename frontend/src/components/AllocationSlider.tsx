@@ -11,7 +11,7 @@ interface AllocationSliderProps {
   remainingAllocation?: number;
 }
 
-export const AllocationSlider: React.FC<AllocationSliderProps> = ({
+export const AllocationSlider = React.memo<AllocationSliderProps>(({
   label,
   value,
   onChange,
@@ -115,4 +115,4 @@ export const AllocationSlider: React.FC<AllocationSliderProps> = ({
       </div>
     </div>
   );
-};
+});

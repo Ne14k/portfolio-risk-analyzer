@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { PortfolioAllocation } from '../types';
 
@@ -21,8 +21,8 @@ const GRADIENTS = {
   cash: 'url(#cashGradient)',
 };
 
-export const AllocationChart: React.FC<AllocationChartProps> = ({ allocation, title }) => {
-  const data = [
+export const AllocationChart = React.memo<AllocationChartProps>(({ allocation, title }) => {
+  const data = useMemo(() => [
     {
       name: 'Stocks',
       value: allocation.stocks * 100,
@@ -43,9 +43,9 @@ export const AllocationChart: React.FC<AllocationChartProps> = ({ allocation, ti
       value: allocation.cash * 100,
       color: COLORS.cash,
     },
-  ].filter(item => item.value > 0);
+  ].filter(item => item.value > 0), [allocation]);
 
-  const renderCustomizedLabel = ({
+  const renderCustomizedLabel = useCallback(({
     cx,
     cy,
     midAngle,
@@ -76,7 +76,7 @@ export const AllocationChart: React.FC<AllocationChartProps> = ({ allocation, ti
         {`${(percent * 100).toFixed(0)}%`}
       </text>
     );
-  };
+  }, []);
 
   return (
     <div className="card-gradient dark:card-gradient-dark rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-sm animate-in">
@@ -150,4 +150,4 @@ export const AllocationChart: React.FC<AllocationChartProps> = ({ allocation, ti
       </ResponsiveContainer>
     </div>
   );
-};
+});
