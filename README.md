@@ -1,5 +1,4 @@
-# Portfolio Risk Analyzer
-
+MyPortfolio
 A professional AI-powered web application for analyzing investment portfolio risk and providing intelligent optimization recommendations using Modern Portfolio Theory.
 
 ## Features
@@ -13,10 +12,6 @@ A professional AI-powered web application for analyzing investment portfolio ris
 - **Dark/Light Mode**: Toggle between themes for optimal viewing
 
 ## Screenshots
-
-### Desktop View
-![image](https://github.com/user-attachments/assets/7d43b9af-a4d2-490e-848c-3c545ef24fd2)
-![image](https://github.com/user-attachments/assets/1c763150-bbb7-4327-b9fb-55199f2c8343)
 
 ### Mobile View
 - Wait for better version
