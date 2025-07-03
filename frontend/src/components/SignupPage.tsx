@@ -162,9 +162,6 @@ export function SignupPage({ isDark, onThemeToggle }: SignupPageProps) {
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               Create your account
             </h2>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Join thousands of users optimizing their portfolios
-            </p>
           </div>
 
           {/* Error Display */}
