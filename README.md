@@ -1,4 +1,4 @@
-# MyPortfolio
+# MyPortfolioTracker
 
 A professional AI-powered web application for analyzing investment portfolio risk and providing intelligent optimization recommendations using Modern Portfolio Theory.
 
