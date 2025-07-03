@@ -62,7 +62,7 @@ function App() {
 
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/">
         <Suspense fallback={
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
             <LoadingSpinner size="lg" />
