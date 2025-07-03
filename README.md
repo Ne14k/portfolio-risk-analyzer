@@ -1,4 +1,4 @@
-# MyPortfolio
+# MyPortfolioTracker
 
 A professional AI-powered web application for analyzing investment portfolio risk and providing intelligent optimization recommendations using Modern Portfolio Theory.
 
@@ -57,8 +57,8 @@ npm run dev
 ```
 
 The application will be available at:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
+- Frontend: https://www.myportfoliotracker.xyz
+- Backend API: https://api.myportfolio.xyz
 
 ## Usage
 
