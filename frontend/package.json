@@ -1,6 +1,7 @@
 {
-  "name": "portfolio-risk-analyzer-frontend",
+  "name": "myportfoliotracker-frontend",
   "version": "0.1.0",
+  "description": "React frontend for MyPortfolioTracker application",
   "private": true,
   "dependencies": {
     "@supabase/supabase-js": "^2.50.3",
