@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { LoadingSpinner } from './components/LoadingSpinner';
+import { AuthProvider } from './contexts/AuthContext';
 
 // Lazy load components for code splitting
 const LandingPage = lazy(() => import('./components/LandingPage').then(m => ({ default: m.LandingPage })));
@@ -11,6 +12,10 @@ const UnderstandRiskPage = lazy(() => import('./components/UnderstandRiskPage').
 const OptimizeStrategyPage = lazy(() => import('./components/OptimizeStrategyPage').then(m => ({ default: m.OptimizeStrategyPage })));
 const TestCrashesPage = lazy(() => import('./components/TestCrashesPage').then(m => ({ default: m.TestCrashesPage })));
 const WhatIfPage = lazy(() => import('./components/WhatIfPage').then(m => ({ default: m.WhatIfPage })));
+const LoginPage = lazy(() => import('./components/LoginPage').then(m => ({ default: m.LoginPage })));
+const SignupPage = lazy(() => import('./components/SignupPage').then(m => ({ default: m.SignupPage })));
+const PrivacyPolicyPage = lazy(() => import('./components/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })));
+const TermsOfServicePage = lazy(() => import('./components/TermsOfServicePage').then(m => ({ default: m.TermsOfServicePage })));
 
 function App() {
   const [isDark, setIsDark] = useState(() => {
@@ -56,13 +61,14 @@ function App() {
   };
 
   return (
-    <Router>
-      <Suspense fallback={
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-          <LoadingSpinner size="lg" />
-        </div>
-      }>
-        <Routes>
+    <AuthProvider>
+      <Router>
+        <Suspense fallback={
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+            <LoadingSpinner size="lg" />
+          </div>
+        }>
+          <Routes>
           <Route 
             path="/" 
             element={
@@ -135,10 +141,47 @@ function App() {
               />
             } 
           />
+          <Route 
+            path="/login" 
+            element={
+              <LoginPage 
+                isDark={isDark} 
+                onThemeToggle={handleThemeToggle} 
+              />
+            } 
+          />
+          <Route 
+            path="/signup" 
+            element={
+              <SignupPage 
+                isDark={isDark} 
+                onThemeToggle={handleThemeToggle} 
+              />
+            } 
+          />
+          <Route 
+            path="/privacy" 
+            element={
+              <PrivacyPolicyPage 
+                isDark={isDark} 
+                onThemeToggle={handleThemeToggle} 
+              />
+            } 
+          />
+          <Route 
+            path="/terms" 
+            element={
+              <TermsOfServicePage 
+                isDark={isDark} 
+                onThemeToggle={handleThemeToggle} 
+              />
+            } 
+          />
         </Routes>
       </Suspense>
     </Router>
-  );
+  </AuthProvider>
+);
 }
 
 export default App;

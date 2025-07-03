@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Shield, Target, Users, ArrowRight, CheckCircle, DollarSign } from 'lucide-react';
 import { Header } from './Header';
+import { Footer } from './Footer';
 
 interface LandingPageProps {
   isDark: boolean;
@@ -9,6 +10,10 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ isDark, onThemeToggle }: LandingPageProps) {
+  useEffect(() => {
+    document.title = 'MyPortfolioTracker - Home';
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-all duration-150">
       <Header isDark={isDark} onThemeToggle={onThemeToggle} />
@@ -165,14 +170,7 @@ export function LandingPage({ isDark, onThemeToggle }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-            <strong>Important:</strong> This is a demonstration tool for educational purposes. Always consult with qualified financial advisors before making investment decisions.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

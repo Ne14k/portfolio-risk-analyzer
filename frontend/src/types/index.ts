@@ -61,3 +61,56 @@ export interface AssetClass {
   volatility: number;
   description: string;
 }
+
+// Authentication types
+export interface User {
+  id: string;
+  email: string;
+  full_name?: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AuthState {
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName?: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+  clearError: () => void;
+}
+
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
+export interface LoginFormErrors {
+  email?: string;
+  password?: string;
+}
+
+export interface SignupFormData {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  fullName: string;
+  acceptTerms: boolean;
+}
+
+export interface SignupFormErrors {
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  fullName?: string;
+  acceptTerms?: string;
+}

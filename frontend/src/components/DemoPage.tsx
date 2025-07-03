@@ -544,7 +544,7 @@ export function DemoPage({ isDark, onThemeToggle }: DemoPageProps) {
       </div>
       
       {/* Footer */}
-      <footer className="mt-16 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+      <footer className="py-8 bg-white dark:bg-gray-800">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
           <div className="text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
