@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://myportfoliotracker.xyz"><strong>View Demo</strong></a> ·
+  <a href="https://myportfoliotracker.xyz"><strong>View Site</strong></a> ·
   <a href="https://github.com/Ne14k/myportfoliotracker/issues">Report Bug</a> ·
   <a href="https://github.com/Ne14k/myportfoliotracker/issues">Request Feature</a>
 </p>
