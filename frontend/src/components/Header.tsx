@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BarChart3, Menu, X, FileBarChart, TrendingUp as TrendingUpIcon, Brain, Target, AlertTriangle, DollarSign, User, LogOut } from 'lucide-react';
+import { BarChart3, Menu, X, FileBarChart, TrendingUp as TrendingUpIcon, Brain, Target, AlertTriangle, DollarSign, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -15,12 +15,6 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
   const navigate = useNavigate();
 
   const menuItems = [
-    {
-      title: "Import Portfolio",
-      description: "Connect your brokerage accounts with Plaid",
-      icon: FileBarChart,
-      path: "/import-portfolio"
-    },
     {
       title: "Forecast My Portfolio", 
       description: "Runs Monte Carlo simulations",
@@ -115,6 +109,13 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
                       </span>
                     </div>
                     <button
+                      onClick={() => navigate('/dashboard')}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md flex items-center space-x-2"
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      <span>Dashboard</span>
+                    </button>
+                    <button
                       onClick={handleSignOut}
                       disabled={loading}
                       className="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
@@ -205,6 +206,16 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
                             {user.full_name || user.email}
                           </span>
                         </div>
+                        <button
+                          onClick={() => {
+                            navigate('/dashboard');
+                            closeMenu();
+                          }}
+                          className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 font-medium flex items-center justify-center space-x-2"
+                        >
+                          <LayoutDashboard className="h-4 w-4" />
+                          <span>Dashboard</span>
+                        </button>
                         <button
                           onClick={() => {
                             handleSignOut();

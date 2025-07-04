@@ -1,14 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import { PlaidConnect } from './PlaidConnect';
-import { ConnectedAccounts } from './ConnectedAccounts';
-import { PortfolioHoldings } from './PortfolioHoldings';
 import { useAuth } from '../contexts/AuthContext';
-import { getMockPortfolioData } from '../services/plaid';
-import { ConnectedAccount, PortfolioHolding, PortfolioSummary } from '../types/plaid';
-import { FileBarChart, Link as LinkIcon, Shield, CheckCircle, BarChart3, Users } from 'lucide-react';
+import { FileBarChart, ArrowRight, BarChart3, PieChart, TrendingUp, Shield, CheckCircle, Plus, Sliders, Eye } from 'lucide-react';
 
 interface ImportPortfolioPageProps {
   isDark: boolean;
@@ -17,271 +12,236 @@ interface ImportPortfolioPageProps {
 
 export function ImportPortfolioPage({ isDark, onThemeToggle }: ImportPortfolioPageProps) {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
-  const [showPlaidConnect, setShowPlaidConnect] = useState(false);
-  
-  // Plaid data state
-  const [connectedAccounts, setConnectedAccounts] = useState<ConnectedAccount[]>([]);
-  const [portfolioHoldings, setPortfolioHoldings] = useState<PortfolioHolding[]>([]);
-  const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null);
-  const [dataLoading, setDataLoading] = useState(false);
-  const [hasConnectedAccounts, setHasConnectedAccounts] = useState(false);
-  const [activeTab, setActiveTab] = useState<'accounts' | 'holdings'>('accounts');
+  const { user } = useAuth();
 
   // Set page title
   useEffect(() => {
-    document.title = 'MyPortfolioTracker - Import Portfolio';
+    document.title = 'MyPortfolioTracker - Dashboard Preview';
   }, []);
 
-  // Redirect to login if not authenticated
+  // If user is authenticated, redirect to dashboard
   useEffect(() => {
-    if (!loading && !user) {
-      navigate('/login');
+    if (user) {
+      navigate('/dashboard');
     }
-  }, [user, loading, navigate]);
-
-  // Load portfolio data from API (with fallback to mock data)
-  const loadPortfolioData = useCallback(async () => {
-    if (!user?.id) return;
-    
-    setDataLoading(true);
-    try {
-      // For demo purposes, use mock data since backend isn't implemented yet
-      const mockData = getMockPortfolioData();
-      setConnectedAccounts(mockData.accounts);
-      setPortfolioHoldings(mockData.holdings);
-      setPortfolioSummary(mockData.summary);
-      setHasConnectedAccounts(mockData.accounts.length > 0);
-
-      /* 
-      // Real API calls (uncomment when backend is ready):
-      const [accounts, holdings, summary] = await Promise.all([
-        getConnectedAccounts(user.id),
-        getPortfolioHoldings(user.id),
-        getPortfolioSummary(user.id)
-      ]);
-      setConnectedAccounts(accounts);
-      setPortfolioHoldings(holdings);
-      setPortfolioSummary(summary);
-      setHasConnectedAccounts(accounts.length > 0);
-      */
-    } catch (error) {
-      console.error('Error loading portfolio data:', error);
-      // Fallback to empty state
-      setConnectedAccounts([]);
-      setPortfolioHoldings([]);
-      setPortfolioSummary(null);
-      setHasConnectedAccounts(false);
-    } finally {
-      setDataLoading(false);
-    }
-  }, [user?.id]);
-
-  // Load portfolio data when user is authenticated
-  useEffect(() => {
-    if (user?.id) {
-      loadPortfolioData();
-    }
-  }, [user?.id, loadPortfolioData]);
-
-  // Handle successful Plaid connection
-  const handlePlaidSuccess = (institutionName: string) => {
-    alert(`Successfully connected to ${institutionName}! Your portfolio data will be imported shortly.`);
-    setShowPlaidConnect(false);
-    loadPortfolioData();
-  };
-
-  // Handle Plaid errors
-  const handlePlaidError = (error: string) => {
-    console.error('Plaid error:', error);
-  };
-
-  // Handle account removal
-  const handleAccountRemoved = (accountId: string) => {
-    setConnectedAccounts(prev => prev.filter(acc => acc.id !== accountId));
-    setPortfolioHoldings(prev => prev.filter(holding => holding.account_id !== accountId));
-    loadPortfolioData(); // Refresh data
-  };
-
-  // Show loading while checking auth
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Don't render if not authenticated (will redirect)
-  if (!user) {
-    return null;
-  }
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-all duration-150">
       <Header isDark={isDark} onThemeToggle={onThemeToggle} />
       
-      {/* Main Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-4 bg-green-100 dark:bg-green-800/30 rounded-2xl flex items-center justify-center">
-            <FileBarChart className="h-8 w-8 text-green-600 dark:text-green-400" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Portfolio Import & Management
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Connect your brokerage accounts securely and manage your portfolio data.
-          </p>
-        </div>
-
-        {showPlaidConnect ? (
-          /* Plaid Connection */
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-              <PlaidConnect 
-                onSuccess={handlePlaidSuccess}
-                onError={handlePlaidError}
-              />
-              
-              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setShowPlaidConnect(false)}
-                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  ← Back
-                </button>
-              </div>
+      {/* Hero Section */}
+      <section className="py-16 lg:py-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+          <div className="text-center mb-12">
+            <div className="w-20 h-20 mx-auto mb-6 bg-green-100 dark:bg-green-800/30 rounded-2xl flex items-center justify-center">
+              <BarChart3 className="h-10 w-10 text-green-600 dark:text-green-400" />
             </div>
-          </div>
-        ) : hasConnectedAccounts ? (
-          /* Portfolio Management View */
-          <div className="space-y-8">
-            {/* Tab Navigation */}
-            <div className="flex items-center justify-between">
-              <div className="flex space-x-1 bg-white dark:bg-gray-800 rounded-xl p-1 border border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setActiveTab('accounts')}
-                  className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    activeTab === 'accounts'
-                      ? 'bg-green-600 text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4" />
-                    <span>Accounts ({connectedAccounts.length})</span>
-                  </div>
-                </button>
-                <button
-                  onClick={() => setActiveTab('holdings')}
-                  className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-                    activeTab === 'holdings'
-                      ? 'bg-green-600 text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center space-x-2">
-                    <BarChart3 className="h-4 w-4" />
-                    <span>Holdings ({portfolioHoldings.length})</span>
-                  </div>
-                </button>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={() => setShowPlaidConnect(true)}
-                  className="px-4 py-2 text-green-600 dark:text-green-400 border border-green-600 dark:border-green-400 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors font-medium"
-                >
-                  Connect More Accounts
-                </button>
-              </div>
-            </div>
-
-            {/* Tab Content */}
-            {activeTab === 'accounts' ? (
-              <ConnectedAccounts
-                accounts={connectedAccounts}
-                loading={dataLoading}
-                onRefresh={loadPortfolioData}
-                onAccountRemoved={handleAccountRemoved}
-              />
-            ) : (
-              portfolioSummary && (
-                <PortfolioHoldings
-                  holdings={portfolioHoldings}
-                  summary={portfolioSummary}
-                  loading={dataLoading}
-                />
-              )
-            )}
-          </div>
-        ) : (
-          /* Welcome/Get Started View */
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-              <div className="w-20 h-20 mx-auto mb-6 bg-green-100 dark:bg-green-800/30 rounded-full flex items-center justify-center">
-                <LinkIcon className="h-10 w-10 text-green-600 dark:text-green-400" />
-              </div>
-              
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Get Started with Portfolio Analysis
-              </h2>
-              
-              <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-                Connect your brokerage accounts securely using Plaid to automatically import your portfolio data and start analyzing your investments.
-              </p>
-
-              {/* Benefits */}
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Support for 12,000+ financial institutions</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Bank-level security with read-only access</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Automatic portfolio data synchronization</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                  <span className="text-gray-700 dark:text-gray-300">Comprehensive risk analysis and optimization</span>
-                </div>
-              </div>
-
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+              Build & Track Your
+              <span className="text-green-600 dark:text-green-400 block">
+                Investment Portfolio
+              </span>
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Take control of your investments with our intuitive portfolio dashboard. 
+              Manually input your holdings, track performance, and analyze risk - all in one place.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
-                onClick={() => setShowPlaidConnect(true)}
-                className="w-full px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] flex items-center justify-center space-x-3"
+                onClick={() => navigate('/signup')}
+                className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold text-lg rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
               >
-                <LinkIcon className="h-5 w-5" />
-                <span>Connect Your Brokerage Account</span>
+                Start Building Your Portfolio
+                <ArrowRight className="h-5 w-5 ml-2" />
               </button>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              {/* Security Notice */}
-              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-                <div className="flex items-center space-x-3">
-                  <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  <div className="text-sm text-left">
-                    <p className="text-blue-800 dark:text-blue-200 font-medium">
-                      Your data is only displayed for analysis - never stored
-                    </p>
-                    <p className="text-blue-700 dark:text-blue-300">
-                      We use Plaid's secure infrastructure with read-only access and 256-bit encryption
-                    </p>
+      {/* Features Preview */}
+      <section className="py-16 bg-white dark:bg-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Your Personal Investment Dashboard
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Everything you need to manage and analyze your portfolio, designed for simplicity and privacy.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 dark:bg-blue-800/30 rounded-xl flex items-center justify-center">
+                <Plus className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Manual Input</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Add your holdings manually with our intuitive forms. Enter stocks, ETFs, bonds, and more with ease.
+              </p>
+            </div>
+            
+            <div className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 dark:bg-green-800/30 rounded-xl flex items-center justify-center">
+                <Sliders className="h-8 w-8 text-green-600 dark:text-green-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Asset Allocation</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Use interactive sliders to set your target allocation across stocks, bonds, real estate, and more.
+              </p>
+            </div>
+            
+            <div className="text-center p-6">
+              <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 dark:bg-purple-800/30 rounded-xl flex items-center justify-center">
+                <TrendingUp className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Performance Tracking</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Track gains, losses, and overall portfolio performance with beautiful charts and analytics.
+              </p>
+            </div>
+          </div>
+
+          {/* Mock Dashboard Preview */}
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard Preview</h3>
+              <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                <Eye className="h-4 w-4" />
+                <span>Demo View</span>
+              </div>
+            </div>
+            
+            {/* Mock Portfolio Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Value</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">$••••••</p>
                   </div>
+                  <PieChart className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Total Gain/Loss</p>
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">+$••••••</p>
+                  </div>
+                  <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Return %</p>
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">+•••%</p>
+                  </div>
+                  <BarChart3 className="h-8 w-8 text-green-600 dark:text-green-400" />
+                </div>
+              </div>
+              
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Holdings</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">••</p>
+                  </div>
+                  <FileBarChart className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                 </div>
               </div>
             </div>
+
+            {/* Call to Action */}
+            <div className="text-center">
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Sign up to access your personal dashboard and start building your portfolio
+              </p>
+              <button
+                onClick={() => navigate('/signup')}
+                className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-200"
+              >
+                Get Started Free
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      </section>
+
+      {/* Privacy & Security */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Privacy First</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Your financial data stays with you. We believe in complete transparency and user control.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <Shield className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  No Data Collection
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Your portfolio data is stored locally in your browser. We never see or store your financial information.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Complete Control
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Export your data anytime, delete it when you want. You own your information completely.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <Eye className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  Open Source
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Our code is transparent and auditable. See exactly how your data is handled.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <Plus className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                  No Account Required
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Start tracking immediately. Create an account only when you want to save your work.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Footer />
     </div>

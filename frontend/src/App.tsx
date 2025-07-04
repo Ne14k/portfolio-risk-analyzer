@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 const LandingPage = lazy(() => import('./components/LandingPage').then(m => ({ default: m.LandingPage })));
 const DemoPage = lazy(() => import('./components/DemoPage').then(m => ({ default: m.DemoPage })));
 const ImportPortfolioPage = lazy(() => import('./components/ImportPortfolioPage').then(m => ({ default: m.ImportPortfolioPage })));
+const DashboardPage = lazy(() => import('./components/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const ForecastPage = lazy(() => import('./components/ForecastPage').then(m => ({ default: m.ForecastPage })));
 const UnderstandRiskPage = lazy(() => import('./components/UnderstandRiskPage').then(m => ({ default: m.UnderstandRiskPage })));
 const OptimizeStrategyPage = lazy(() => import('./components/OptimizeStrategyPage').then(m => ({ default: m.OptimizeStrategyPage })));
@@ -91,6 +92,15 @@ function App() {
             path="/import-portfolio" 
             element={
               <ImportPortfolioPage 
+                isDark={isDark} 
+                onThemeToggle={handleThemeToggle} 
+              />
+            } 
+          />
+          <Route 
+            path="/dashboard" 
+            element={
+              <DashboardPage 
                 isDark={isDark} 
                 onThemeToggle={handleThemeToggle} 
               />
