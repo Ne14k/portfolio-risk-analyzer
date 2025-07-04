@@ -3,7 +3,6 @@ import { usePlaidLink } from 'react-plaid-link';
 import { Link as LinkIcon, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { createLinkToken, exchangePublicToken } from '../services/plaid';
-import { PlaidLinkSuccess, PlaidLinkExit, PlaidLinkEvent } from '../types/plaid';
 
 interface PlaidConnectProps {
   onSuccess: (institutionName: string) => void;
@@ -41,7 +40,7 @@ export function PlaidConnect({ onSuccess, onError }: PlaidConnectProps) {
   }, [user?.id, onError]);
 
   // Handle successful connection
-  const handleOnSuccess = useCallback(async (public_token: string, metadata: PlaidLinkSuccess['metadata']) => {
+  const handleOnSuccess = useCallback(async (public_token: string, metadata: any) => {
     if (!user?.id) return;
     
     setConnecting(true);
@@ -49,7 +48,8 @@ export function PlaidConnect({ onSuccess, onError }: PlaidConnectProps) {
     
     try {
       await exchangePublicToken(public_token, user.id);
-      onSuccess(metadata.institution.name);
+      const institutionName = metadata.institution?.name || 'Unknown Institution';
+      onSuccess(institutionName);
     } catch (err) {
       const errorMessage = 'Failed to complete account connection. Please try again.';
       setError(errorMessage);
@@ -60,7 +60,7 @@ export function PlaidConnect({ onSuccess, onError }: PlaidConnectProps) {
   }, [user?.id, onSuccess, onError]);
 
   // Handle connection exit
-  const handleOnExit = useCallback((err: any, metadata: PlaidLinkExit['metadata']) => {
+  const handleOnExit = useCallback((err: any, metadata: any) => {
     if (err) {
       const errorMessage = err.error_message || 'Connection was cancelled or failed.';
       setError(errorMessage);
@@ -69,7 +69,7 @@ export function PlaidConnect({ onSuccess, onError }: PlaidConnectProps) {
   }, [onError]);
 
   // Handle Plaid events for analytics
-  const handleOnEvent = useCallback((eventName: string, metadata: PlaidLinkEvent['metadata']) => {
+  const handleOnEvent = useCallback((eventName: string, metadata: any) => {
     console.log('Plaid event:', eventName, metadata);
   }, []);
 

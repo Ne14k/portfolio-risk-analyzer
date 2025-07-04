@@ -89,7 +89,7 @@ export function ConnectedAccounts({
   const getAccountTypeBadge = (type: string, subtype: string) => {
     const typeKey = `${type}_${subtype}`.toLowerCase();
     
-    const badges = {
+    const badges: Record<string, string> = {
       'investment_brokerage': 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-300',
       'investment_401k': 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300',
       'investment_ira': 'bg-purple-100 text-purple-800 dark:bg-purple-800/20 dark:text-purple-300',

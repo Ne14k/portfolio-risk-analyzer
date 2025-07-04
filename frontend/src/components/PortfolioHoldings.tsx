@@ -4,7 +4,6 @@ import {
   TrendingDown, 
   Minus,
   Search,
-  Filter,
   SortAsc,
   SortDesc,
   PieChart,

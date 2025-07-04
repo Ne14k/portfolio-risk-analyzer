@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
@@ -6,7 +6,7 @@ import { PlaidConnect } from './PlaidConnect';
 import { ConnectedAccounts } from './ConnectedAccounts';
 import { PortfolioHoldings } from './PortfolioHoldings';
 import { useAuth } from '../contexts/AuthContext';
-import { getConnectedAccounts, getPortfolioHoldings, getPortfolioSummary, getMockPortfolioData } from '../services/plaid';
+import { getMockPortfolioData } from '../services/plaid';
 import { ConnectedAccount, PortfolioHolding, PortfolioSummary } from '../types/plaid';
 import { FileBarChart, Link as LinkIcon, Shield, CheckCircle, BarChart3, Users, ArrowRight } from 'lucide-react';
 
@@ -40,15 +40,8 @@ export function ImportPortfolioPage({ isDark, onThemeToggle }: ImportPortfolioPa
     }
   }, [user, loading, navigate]);
 
-  // Load portfolio data when user is authenticated
-  useEffect(() => {
-    if (user?.id) {
-      loadPortfolioData();
-    }
-  }, [user?.id]);
-
   // Load portfolio data from API (with fallback to mock data)
-  const loadPortfolioData = async () => {
+  const loadPortfolioData = useCallback(async () => {
     if (!user?.id) return;
     
     setDataLoading(true);
@@ -82,7 +75,14 @@ export function ImportPortfolioPage({ isDark, onThemeToggle }: ImportPortfolioPa
     } finally {
       setDataLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  // Load portfolio data when user is authenticated
+  useEffect(() => {
+    if (user?.id) {
+      loadPortfolioData();
+    }
+  }, [user?.id, loadPortfolioData]);
 
   // Handle successful Plaid connection
   const handlePlaidSuccess = (institutionName: string) => {
@@ -291,8 +291,6 @@ export function ImportPortfolioPage({ isDark, onThemeToggle }: ImportPortfolioPa
                 </button>
               </div>
             </div>
-          </div>
-        )}
           </div>
         )}
       </div>
