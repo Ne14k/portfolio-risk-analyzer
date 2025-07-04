@@ -8,7 +8,7 @@ import { PortfolioHoldings } from './PortfolioHoldings';
 import { useAuth } from '../contexts/AuthContext';
 import { getMockPortfolioData } from '../services/plaid';
 import { ConnectedAccount, PortfolioHolding, PortfolioSummary } from '../types/plaid';
-import { FileBarChart, Link as LinkIcon, Shield, CheckCircle, BarChart3, Users, ArrowRight } from 'lucide-react';
+import { FileBarChart, Link as LinkIcon, Shield, CheckCircle, BarChart3, Users } from 'lucide-react';
 
 interface ImportPortfolioPageProps {
   isDark: boolean;
@@ -103,11 +103,6 @@ export function ImportPortfolioPage({ isDark, onThemeToggle }: ImportPortfolioPa
     loadPortfolioData(); // Refresh data
   };
 
-  // Navigate to portfolio analysis
-  const handleAnalyzePortfolio = () => {
-    navigate('/demo');
-  };
-
   // Show loading while checking auth
   if (loading) {
     return (
@@ -144,7 +139,26 @@ export function ImportPortfolioPage({ isDark, onThemeToggle }: ImportPortfolioPa
           </p>
         </div>
 
-        {hasConnectedAccounts ? (
+        {showPlaidConnect ? (
+          /* Plaid Connection */
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
+              <PlaidConnect 
+                onSuccess={handlePlaidSuccess}
+                onError={handlePlaidError}
+              />
+              
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setShowPlaidConnect(false)}
+                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                >
+                  ← Back
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : hasConnectedAccounts ? (
           /* Portfolio Management View */
           <div className="space-y-8">
             {/* Tab Navigation */}
@@ -185,13 +199,6 @@ export function ImportPortfolioPage({ isDark, onThemeToggle }: ImportPortfolioPa
                 >
                   Connect More Accounts
                 </button>
-                <button
-                  onClick={handleAnalyzePortfolio}
-                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium flex items-center space-x-2"
-                >
-                  <span>Analyze Portfolio</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
               </div>
             </div>
 
@@ -213,7 +220,7 @@ export function ImportPortfolioPage({ isDark, onThemeToggle }: ImportPortfolioPa
               )
             )}
           </div>
-        ) : !showPlaidConnect ? (
+        ) : (
           /* Welcome/Get Started View */
           <div className="max-w-2xl mx-auto text-center">
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
@@ -270,25 +277,6 @@ export function ImportPortfolioPage({ isDark, onThemeToggle }: ImportPortfolioPa
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* Plaid Connection */
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700">
-              <PlaidConnect 
-                onSuccess={handlePlaidSuccess}
-                onError={handlePlaidError}
-              />
-              
-              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <button
-                  onClick={() => setShowPlaidConnect(false)}
-                  className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-                >
-                  ← Back
-                </button>
               </div>
             </div>
           </div>
