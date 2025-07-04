@@ -17,7 +17,7 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
   const menuItems = [
     {
       title: "Import Portfolio",
-      description: "Uses Plaid or file upload",
+      description: "Connect your brokerage accounts with Plaid",
       icon: FileBarChart,
       path: "/import-portfolio"
     },
