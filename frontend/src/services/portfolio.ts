@@ -1,4 +1,5 @@
-import { Portfolio, Holding, PortfolioSummary, AssetAllocation, HoldingFormData, StockQuote, PortfolioTemplate } from '../types/portfolio';
+import { Portfolio, Holding, PortfolioSummary, HoldingFormData, StockQuote, PortfolioTemplate } from '../types/portfolio';
+import { getStockQuote as finnhubGetStockQuote } from './finnhub';
 
 // Local storage keys
 const PORTFOLIO_STORAGE_KEY = 'myportfolio_data';
@@ -189,10 +190,20 @@ export class PortfolioService {
 }
 
 /**
- * Mock stock price service (replace with real API in production)
+ * Stock price service using Finnhub API
  */
 export const getStockQuote = async (symbol: string): Promise<StockQuote | null> => {
-  // Mock implementation - replace with real API like Alpha Vantage, IEX Cloud, etc.
+  try {
+    // Try to get real data from Finnhub first
+    const quote = await finnhubGetStockQuote(symbol);
+    if (quote) {
+      return quote;
+    }
+  } catch (error) {
+    console.warn('Finnhub API unavailable, falling back to mock data');
+  }
+  
+  // Fallback to mock data if Finnhub fails (for demo purposes)
   await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
   
   const mockPrices: Record<string, StockQuote> = {

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { BarChart3, Mail } from 'lucide-react';
 
 export function Footer() {
-  const currentYear = new Date().getFullYear();
 
   return (
     <footer className="py-8 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">

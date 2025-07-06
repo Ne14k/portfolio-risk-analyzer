@@ -1,8 +1,73 @@
-import { supabase } from '../config/supabase';
+import { supabase } from '../utils/supabaseClient';
 import { User } from '../types';
 
 // Authentication service utilities
 export class AuthService {
+  // Sign up a new user
+  static async signUp(email: string, password: string, fullName?: string): Promise<{ user: any; error: any }> {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName || 'MyPortfolioTracker User'
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Signup error:', error.message);
+        return { user: null, error: this.formatAuthError(error.message) };
+      }
+
+      console.log('Signup success:', data);
+      return { user: data.user, error: null };
+    } catch (error) {
+      console.error('Unexpected signup error:', error);
+      return { user: null, error: 'An unexpected error occurred during signup' };
+    }
+  }
+
+  // Sign in an existing user
+  static async signIn(email: string, password: string): Promise<{ user: any; error: any }> {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error('Signin error:', error.message);
+        return { user: null, error: this.formatAuthError(error.message) };
+      }
+
+      console.log('Signin success:', data);
+      return { user: data.user, error: null };
+    } catch (error) {
+      console.error('Unexpected signin error:', error);
+      return { user: null, error: 'An unexpected error occurred during signin' };
+    }
+  }
+
+  // Sign out current user
+  static async signOut(): Promise<{ error: any }> {
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Signout error:', error.message);
+        return { error: error.message };
+      }
+
+      console.log('Signout success');
+      return { error: null };
+    } catch (error) {
+      console.error('Unexpected signout error:', error);
+      return { error: 'An unexpected error occurred during signout' };
+    }
+  }
+
   // Check if user is authenticated
   static async isAuthenticated(): Promise<boolean> {
     try {
@@ -132,6 +197,9 @@ export class AuthService {
 
 // Export utility functions for convenience
 export const { 
+  signUp,
+  signIn,
+  signOut,
   isAuthenticated, 
   getCurrentUser, 
   updateProfile, 

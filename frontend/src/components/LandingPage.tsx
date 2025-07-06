@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, Shield, Target, ArrowRight, CheckCircle, DollarSign } from 'lucide-react';
+import { Shield, Target, ArrowRight, DollarSign } from 'lucide-react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 

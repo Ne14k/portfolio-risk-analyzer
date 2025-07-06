@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BarChart3, Menu, X, FileBarChart, TrendingUp as TrendingUpIcon, Brain, Target, AlertTriangle, DollarSign, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { BarChart3 } from 'lucide-react'; // Keep logo icon as requested
+import { Menu, Close, TrendingUp, Psychology, GpsFixed, Warning, AttachMoney, Person, Logout, Dashboard } from '@mui/icons-material';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -18,31 +19,31 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
     {
       title: "Forecast My Portfolio", 
       description: "Runs Monte Carlo simulations",
-      icon: TrendingUpIcon,
+      icon: TrendingUp,
       path: "/forecast"
     },
     {
       title: "Understand My Risk",
       description: "LLM explains Sharpe ratio, volatility, etc.",
-      icon: Brain,
+      icon: Psychology,
       path: "/understand-risk"
     },
     {
       title: "Optimize My Strategy",
       description: "AI reallocates portfolio based on risk/return goals",
-      icon: Target,
+      icon: GpsFixed,
       path: "/optimize"
     },
     {
       title: "Test Market Crashes",
       description: "Simulates 2008/Fed hike scenarios", 
-      icon: AlertTriangle,
+      icon: Warning,
       path: "/test-crashes"
     },
     {
       title: "What If I Invested In…",
       description: "Scenario builder w/ backtest logic",
-      icon: DollarSign,
+      icon: AttachMoney,
       path: "/what-if"
     }
   ];
@@ -70,17 +71,17 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
   return (
     <>
       <header className="bg-white dark:bg-gray-800 shadow-sm relative z-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             {/* Left side - Hamburger Menu + Logo */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="p-1.5 sm:p-2 text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 aria-label="Toggle menu"
               >
                 {isMenuOpen ? (
-                  <X className="h-6 w-6" />
+                  <Close className="h-6 w-6" />
                 ) : (
                   <Menu className="h-6 w-6" />
                 )}
@@ -90,20 +91,20 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
                 <div className="p-2 bg-green-600 rounded-lg">
                   <BarChart3 className="h-6 w-6 text-white" />
                 </div>
-                <h1 className="text-2xl font-bold text-green-600 dark:text-green-400">
+                <h1 className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400">
                   MyPortfolioTracker
                 </h1>
               </Link>
             </div>
             
             {/* Right side - Auth Buttons + Theme Toggle */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <div className="hidden md:flex items-center space-x-3">
                 {user ? (
                   // Authenticated user menu
                   <div className="flex items-center space-x-3">
                     <div className="flex items-center space-x-2 px-3 py-2 text-gray-700 dark:text-gray-300">
-                      <User className="h-4 w-4" />
+                      <Person className="h-4 w-4" />
                       <span className="text-sm font-medium">
                         {user.full_name || user.email}
                       </span>
@@ -112,7 +113,7 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
                       onClick={() => navigate('/dashboard')}
                       className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md flex items-center space-x-2"
                     >
-                      <LayoutDashboard className="h-4 w-4" />
+                      <Dashboard className="h-4 w-4" />
                       <span>Dashboard</span>
                     </button>
                     <button
@@ -120,7 +121,7 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
                       disabled={loading}
                       className="px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                     >
-                      <LogOut className="h-4 w-4" />
+                      <Logout className="h-4 w-4" />
                       <span>Sign Out</span>
                     </button>
                   </div>
@@ -201,7 +202,7 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
                       // Authenticated user mobile menu
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">
-                          <User className="h-4 w-4" />
+                          <Person className="h-4 w-4" />
                           <span className="text-sm font-medium">
                             {user.full_name || user.email}
                           </span>
@@ -213,7 +214,7 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
                           }}
                           className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 font-medium flex items-center justify-center space-x-2"
                         >
-                          <LayoutDashboard className="h-4 w-4" />
+                          <Dashboard className="h-4 w-4" />
                           <span>Dashboard</span>
                         </button>
                         <button
@@ -224,7 +225,7 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
                           disabled={loading}
                           className="w-full px-4 py-2 text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                         >
-                          <LogOut className="h-4 w-4" />
+                          <Logout className="h-4 w-4" />
                           <span>Sign Out</span>
                         </button>
                       </div>

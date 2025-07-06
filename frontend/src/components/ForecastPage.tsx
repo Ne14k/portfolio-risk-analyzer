@@ -131,6 +131,7 @@ export function ForecastPage({ isDark, onThemeToggle }: ForecastPageProps) {
         </div>
       </section>
 
+
       {/* Signup CTA */}
       <SignupCTA 
         featureName="Portfolio Forecasting"

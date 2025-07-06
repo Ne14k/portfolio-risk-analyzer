@@ -65,6 +65,15 @@ export interface HoldingFormData {
   category: AssetCategory;
 }
 
+export interface HoldingFormErrors {
+  ticker?: string;
+  name?: string;
+  quantity?: string;
+  purchasePrice?: string;
+  currentPrice?: string;
+  category?: string;
+}
+
 export interface AllocationFormData {
   stocks: number;
   bonds: number;

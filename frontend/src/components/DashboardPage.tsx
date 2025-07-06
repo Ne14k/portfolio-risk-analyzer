@@ -5,7 +5,7 @@ import { Footer } from './Footer';
 import { HoldingForm } from './HoldingForm';
 import { useAuth } from '../contexts/AuthContext';
 import { PortfolioService } from '../services/portfolio';
-import { Portfolio, Holding, PortfolioSummary } from '../types/portfolio';
+import { Portfolio, PortfolioSummary } from '../types/portfolio';
 import { 
   BarChart3, 
   Plus, 
@@ -16,7 +16,6 @@ import {
   PieChart,
   RefreshCw,
   Download,
-  Upload,
   Sliders
 } from 'lucide-react';
 

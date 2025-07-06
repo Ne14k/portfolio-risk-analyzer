@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import { PortfolioAllocation, PortfolioInput, OptimizationResult } from '../types';
 import { analyzePortfolio } from '../services/api';
 import { Header } from './Header';
