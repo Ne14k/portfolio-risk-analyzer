@@ -41,6 +41,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # Local development
         "https://myportfoliotracker.xyz",  # Custom domain
+        "https://www.myportfoliotracker.xyz",  # www subdomain
         "https://*.myportfoliotracker.xyz",  # Subdomains
         "https://*.vercel.app",  # Vercel domains
     ],
