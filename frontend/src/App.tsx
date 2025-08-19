@@ -9,10 +9,7 @@ const DemoPage = lazy(() => import('./components/DemoPage').then(m => ({ default
 const ImportPortfolioPage = lazy(() => import('./components/ImportPortfolioPage').then(m => ({ default: m.ImportPortfolioPage })));
 const DashboardPage = lazy(() => import('./components/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const ForecastPage = lazy(() => import('./components/ForecastPage').then(m => ({ default: m.ForecastPage })));
-const UnderstandRiskPage = lazy(() => import('./components/UnderstandRiskPage').then(m => ({ default: m.UnderstandRiskPage })));
 const OptimizeStrategyPage = lazy(() => import('./components/OptimizeStrategyPage').then(m => ({ default: m.OptimizeStrategyPage })));
-const TestCrashesPage = lazy(() => import('./components/TestCrashesPage').then(m => ({ default: m.TestCrashesPage })));
-const WhatIfPage = lazy(() => import('./components/WhatIfPage').then(m => ({ default: m.WhatIfPage })));
 const LoginPage = lazy(() => import('./components/LoginPage').then(m => ({ default: m.LoginPage })));
 const SignupPage = lazy(() => import('./components/SignupPage').then(m => ({ default: m.SignupPage })));
 const PrivacyPolicyPage = lazy(() => import('./components/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })));
@@ -116,36 +113,9 @@ function App() {
             } 
           />
           <Route 
-            path="/understand-risk" 
-            element={
-              <UnderstandRiskPage 
-                isDark={isDark} 
-                onThemeToggle={handleThemeToggle} 
-              />
-            } 
-          />
-          <Route 
             path="/optimize" 
             element={
               <OptimizeStrategyPage 
-                isDark={isDark} 
-                onThemeToggle={handleThemeToggle} 
-              />
-            } 
-          />
-          <Route 
-            path="/test-crashes" 
-            element={
-              <TestCrashesPage 
-                isDark={isDark} 
-                onThemeToggle={handleThemeToggle} 
-              />
-            } 
-          />
-          <Route 
-            path="/what-if" 
-            element={
-              <WhatIfPage 
                 isDark={isDark} 
                 onThemeToggle={handleThemeToggle} 
               />

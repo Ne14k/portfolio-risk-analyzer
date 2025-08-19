@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { HoldingForm } from './HoldingForm';
+import { AssetAllocationChart } from './AssetAllocationChart';
+import { PortfolioForecast } from './PortfolioForecast';
 import { useAuth } from '../contexts/AuthContext';
 import { PortfolioService } from '../services/portfolio';
 import { Portfolio, PortfolioSummary } from '../types/portfolio';
@@ -14,9 +16,8 @@ import {
   TrendingUp, 
   TrendingDown, 
   PieChart,
-  RefreshCw,
-  Download,
-  Sliders
+  Sliders,
+  Calendar
 } from 'lucide-react';
 
 interface DashboardPageProps {
@@ -31,7 +32,7 @@ export function DashboardPage({ isDark, onThemeToggle }: DashboardPageProps) {
   const [summary, setSummary] = useState<PortfolioSummary | null>(null);
   const [showAddHolding, setShowAddHolding] = useState(false);
   const [editingHolding, setEditingHolding] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'holdings' | 'allocation'>('holdings');
+  const [activeTab, setActiveTab] = useState<'holdings' | 'allocation' | 'forecast'>('holdings');
 
   // Set page title
   useEffect(() => {
@@ -45,25 +46,89 @@ export function DashboardPage({ isDark, onThemeToggle }: DashboardPageProps) {
     }
   }, [user, loading, navigate]);
 
-  // Load portfolio data
+  // Load portfolio data and start auto-updates
   useEffect(() => {
     if (user) {
+      console.log('User authenticated, loading portfolio data...');
+      console.log('User details:', {
+        id: user.id,
+        email: user.email,
+      });
+      
+      
       loadPortfolioData();
+      // Start automatic price updates every 60 minutes
+      PortfolioService.startAutoUpdates();
     }
+    
+    // Cleanup interval on unmount
+    return () => {
+      PortfolioService.stopAutoUpdates();
+    };
   }, [user]);
 
-  const loadPortfolioData = () => {
-    const portfolioData = PortfolioService.loadPortfolio() || PortfolioService.createEmptyPortfolio();
-    const summaryData = PortfolioService.getPortfolioSummary();
-    
-    setPortfolio(portfolioData);
-    setSummary(summaryData);
+  const loadPortfolioData = async () => {
+    try {
+      const portfolioData = await PortfolioService.loadPortfolio() || PortfolioService.createEmptyPortfolio();
+      const summaryData = await PortfolioService.getPortfolioSummary();
+      
+      setPortfolio(portfolioData);
+      setSummary(summaryData || {
+        totalValue: portfolioData.totalValue,
+        totalGainLoss: 0,
+        totalGainLossPercentage: 0,
+        holdingsCount: portfolioData.holdings.length,
+        assetAllocation: portfolioData.assetAllocation,
+        topHoldings: portfolioData.holdings.slice(0, 5),
+        lastUpdated: portfolioData.lastUpdated
+      });
+    } catch (error) {
+      console.error('Error loading portfolio data:', error);
+      // Fallback to empty portfolio
+      const emptyPortfolio = PortfolioService.createEmptyPortfolio();
+      setPortfolio(emptyPortfolio);
+      setSummary({
+        totalValue: 0,
+        totalGainLoss: 0,
+        totalGainLossPercentage: 0,
+        holdingsCount: 0,
+        assetAllocation: emptyPortfolio.assetAllocation,
+        topHoldings: [],
+        lastUpdated: new Date().toISOString()
+      });
+    }
   };
 
+  // Auto-refresh component when localStorage changes (for auto-updates)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      if (user) {
+        loadPortfolioData();
+      }
+    };
+
+    // Listen for manual updates to localStorage
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also set up polling to catch programmatic updates
+    const pollInterval = setInterval(() => {
+      if (user) {
+        loadPortfolioData();
+      }
+    }, 10000); // Check every 10 seconds for UI updates
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(pollInterval);
+    };
+  }, [user]);
+
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-CA', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'CAD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -77,10 +142,12 @@ export function DashboardPage({ isDark, onThemeToggle }: DashboardPageProps) {
     return 'text-gray-600 dark:text-gray-400';
   };
 
-  const handleDeleteHolding = (holdingId: string) => {
+  const handleDeleteHolding = async (holdingId: string) => {
     if (window.confirm('Are you sure you want to delete this holding?')) {
-      PortfolioService.removeHolding(holdingId);
-      loadPortfolioData();
+      const success = await PortfolioService.removeHolding(holdingId);
+      if (success) {
+        loadPortfolioData();
+      }
     }
   };
 
@@ -98,12 +165,15 @@ export function DashboardPage({ isDark, onThemeToggle }: DashboardPageProps) {
     linkElement.click();
   };
 
-  const clearPortfolio = () => {
+  const clearPortfolio = async () => {
     if (window.confirm('Are you sure you want to clear all portfolio data? This cannot be undone.')) {
-      PortfolioService.clearPortfolio();
-      loadPortfolioData();
+      const success = await PortfolioService.clearPortfolio();
+      if (success) {
+        loadPortfolioData();
+      }
     }
   };
+  
 
   // Show loading while checking auth
   if (loading) {
@@ -152,20 +222,6 @@ export function DashboardPage({ isDark, onThemeToggle }: DashboardPageProps) {
           
           <div className="flex items-center space-x-3">
             <button
-              onClick={loadPortfolioData}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              title="Refresh data"
-            >
-              <RefreshCw className="h-5 w-5" />
-            </button>
-            <button
-              onClick={exportPortfolio}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-              title="Export portfolio"
-            >
-              <Download className="h-5 w-5" />
-            </button>
-            <button
               onClick={() => setShowAddHolding(true)}
               className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium flex items-center space-x-2"
             >
@@ -176,44 +232,21 @@ export function DashboardPage({ isDark, onThemeToggle }: DashboardPageProps) {
         </div>
 
         {/* Portfolio Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Value</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Total Value (CAD)</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {formatCurrency(summary.totalValue)}
                 </p>
+                {portfolio && portfolio.holdings.length > 0 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    Auto-updates every 60 min
+                  </p>
+                )}
               </div>
               <PieChart className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Gain/Loss</p>
-                <p className={`text-2xl font-bold ${getGainLossColor(summary.totalGainLoss)}`}>
-                  {formatCurrency(summary.totalGainLoss)}
-                </p>
-              </div>
-              {summary.totalGainLoss >= 0 ? (
-                <TrendingUp className="h-8 w-8 text-green-600 dark:text-green-400" />
-              ) : (
-                <TrendingDown className="h-8 w-8 text-red-600 dark:text-red-400" />
-              )}
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Return %</p>
-                <p className={`text-2xl font-bold ${getGainLossColor(summary.totalGainLossPercentage)}`}>
-                  {formatPercentage(summary.totalGainLossPercentage)}
-                </p>
-              </div>
-              <BarChart3 className="h-8 w-8 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
 
@@ -224,6 +257,11 @@ export function DashboardPage({ isDark, onThemeToggle }: DashboardPageProps) {
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {summary.holdingsCount}
                 </p>
+                {portfolio && (
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    Updated: {new Date(portfolio.lastUpdated).toLocaleTimeString()}
+                  </p>
+                )}
               </div>
               <BarChart3 className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
@@ -304,13 +342,10 @@ export function DashboardPage({ isDark, onThemeToggle }: DashboardPageProps) {
                         Quantity
                       </th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Price
+                        Price (CAD)
                       </th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Market Value
-                      </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Gain/Loss
+                        Market Value (per share)
                       </th>
                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Actions
@@ -337,18 +372,10 @@ export function DashboardPage({ isDark, onThemeToggle }: DashboardPageProps) {
                           {holding.quantity.toLocaleString()}
                         </td>
                         <td className="px-6 py-4 text-right font-medium text-gray-900 dark:text-white">
-                          {formatCurrency(holding.currentPrice)}
+                          {formatCurrency(holding.quantity * holding.currentPrice)}
                         </td>
                         <td className="px-6 py-4 text-right font-semibold text-gray-900 dark:text-white">
-                          {formatCurrency(holding.marketValue)}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className={`font-semibold ${getGainLossColor(holding.gainLoss)}`}>
-                            {formatCurrency(holding.gainLoss)}
-                          </div>
-                          <div className={`text-sm ${getGainLossColor(holding.gainLossPercentage)}`}>
-                            {formatPercentage(holding.gainLossPercentage)}
-                          </div>
+                          {formatCurrency(holding.currentPrice)}
                         </td>
                         <td className="px-6 py-4 text-center">
                           <div className="flex items-center justify-center space-x-2">
@@ -377,45 +404,12 @@ export function DashboardPage({ isDark, onThemeToggle }: DashboardPageProps) {
           )
         ) : (
           /* Asset Allocation Tab */
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Current Asset Allocation</h3>
-            
-            {portfolio.holdings.length === 0 ? (
-              <div className="text-center py-8">
-                <PieChart className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600 dark:text-gray-400">
-                  Add holdings to see your asset allocation
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {Object.entries(summary.assetAllocation).map(([category, percentage]) => (
-                  percentage > 0 && (
-                    <div key={category} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-4 h-4 bg-green-600 rounded"></div>
-                        <span className="font-medium text-gray-900 dark:text-white capitalize">
-                          {category.replace(/([A-Z])/g, ' $1').trim()}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-32 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                          <div 
-                            className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${percentage}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-sm font-medium text-gray-900 dark:text-white w-12 text-right">
-                          {percentage.toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                  )
-                ))}
-              </div>
-            )}
-          </div>
+          <AssetAllocationChart 
+            allocation={summary.assetAllocation}
+            title="Current Asset Allocation"
+          />
         )}
+        
       </div>
 
       <Footer />

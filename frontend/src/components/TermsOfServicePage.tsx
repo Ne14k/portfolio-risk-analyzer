@@ -80,7 +80,6 @@ export function TermsOfServicePage({ isDark, onThemeToggle }: TermsOfServicePage
                   <li>Portfolio risk assessment and analytics</li>
                   <li>Monte Carlo simulations for portfolio forecasting</li>
                   <li>Portfolio optimization recommendations</li>
-                  <li>Market crash scenario testing</li>
                   <li>Educational content about investment principles</li>
                 </ul>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">

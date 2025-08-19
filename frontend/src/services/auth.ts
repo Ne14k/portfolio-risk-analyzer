@@ -6,7 +6,8 @@ export class AuthService {
   // Sign up a new user
   static async signUp(email: string, password: string, fullName?: string): Promise<{ user: any; error: any }> {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      // Add timeout to prevent indefinite hanging
+      const signUpPromise = supabase.auth.signUp({
         email,
         password,
         options: {
@@ -16,15 +17,44 @@ export class AuthService {
         }
       });
 
+      // Set a 10-second timeout
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error('Sign up request timed out. This email may already be registered with Google OAuth.'));
+        }, 10000);
+      });
+
+      const { data, error } = await Promise.race([signUpPromise, timeoutPromise]) as any;
+
       if (error) {
         console.error('Signup error:', error.message);
+        
+        // Handle specific OAuth conflict scenarios
+        if (error.message.includes('already registered') || 
+            error.message.includes('User already registered') ||
+            error.message.includes('Email address already in use')) {
+          return { 
+            user: null, 
+            error: 'This email is already registered. Please sign in instead or use Google OAuth if you previously signed up with Google.' 
+          };
+        }
+        
         return { user: null, error: this.formatAuthError(error.message) };
       }
 
       console.log('Signup success:', data);
       return { user: data.user, error: null };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Unexpected signup error:', error);
+      
+      // Handle timeout specifically
+      if (error.message.includes('timed out')) {
+        return { 
+          user: null, 
+          error: 'Sign up timed out. This email may already be registered with Google OAuth. Please try signing in or use Google sign-in instead.' 
+        };
+      }
+      
       return { user: null, error: 'An unexpected error occurred during signup' };
     }
   }
@@ -65,6 +95,28 @@ export class AuthService {
     } catch (error) {
       console.error('Unexpected signout error:', error);
       return { error: 'An unexpected error occurred during signout' };
+    }
+  }
+
+  // Sign in with Google OAuth
+  static async signInWithGoogle(): Promise<{ error: any }> {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+
+      if (error) {
+        console.error('Google OAuth error:', error.message);
+        return { error: this.formatAuthError(error.message) };
+      }
+
+      return { error: null };
+    } catch (error) {
+      console.error('Unexpected Google OAuth error:', error);
+      return { error: 'An unexpected error occurred during Google sign-in' };
     }
   }
 
@@ -200,6 +252,7 @@ export const {
   signUp,
   signIn,
   signOut,
+  signInWithGoogle,
   isAuthenticated, 
   getCurrentUser, 
   updateProfile, 

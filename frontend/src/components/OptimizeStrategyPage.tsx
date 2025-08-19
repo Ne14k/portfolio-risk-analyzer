@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from './Header';
 import { SignupCTA } from './SignupCTA';
-import { Target, Zap, BarChart3, TrendingUp, Settings, ArrowRight } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { Target, Zap, BarChart3, TrendingUp, Settings, ArrowRight, Loader2 } from 'lucide-react';
 
 interface OptimizeStrategyPageProps {
   isDark: boolean;
@@ -9,6 +11,38 @@ interface OptimizeStrategyPageProps {
 }
 
 export function OptimizeStrategyPage({ isDark, onThemeToggle }: OptimizeStrategyPageProps) {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  // Set page title
+  useEffect(() => {
+    document.title = 'MyPortfolioTracker - Optimize Strategy';
+  }, []);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
+
+  // Show loading while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-all duration-150">
       <Header isDark={isDark} onThemeToggle={onThemeToggle} />

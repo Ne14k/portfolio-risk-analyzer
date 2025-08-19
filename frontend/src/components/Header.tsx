@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BarChart3 } from 'lucide-react'; // Keep logo icon as requested
-import { Menu, Close, TrendingUp, Psychology, GpsFixed, Warning, AttachMoney, Person, Logout, Dashboard } from '@mui/icons-material';
+import { Menu, Close, TrendingUp, GpsFixed, Person, Logout, Dashboard } from '@mui/icons-material';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -23,28 +23,10 @@ export function Header({ isDark, onThemeToggle }: HeaderProps) {
       path: "/forecast"
     },
     {
-      title: "Understand My Risk",
-      description: "LLM explains Sharpe ratio, volatility, etc.",
-      icon: Psychology,
-      path: "/understand-risk"
-    },
-    {
       title: "Optimize My Strategy",
       description: "AI reallocates portfolio based on risk/return goals",
       icon: GpsFixed,
       path: "/optimize"
-    },
-    {
-      title: "Test Market Crashes",
-      description: "Simulates 2008/Fed hike scenarios", 
-      icon: Warning,
-      path: "/test-crashes"
-    },
-    {
-      title: "What If I Invested In…",
-      description: "Scenario builder w/ backtest logic",
-      icon: AttachMoney,
-      path: "/what-if"
     }
   ];
 

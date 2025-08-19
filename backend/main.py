@@ -6,11 +6,35 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize, differential_evolution
 from datetime import datetime
-import json
 import random
 from itertools import product
+import logging
+import sys
+import os
+
+# Add the ml_python path for imports
+sys.path.append(os.path.join(os.path.dirname(__file__), 'ml_python'))
+
+# Import professional Monte Carlo services
+from ml_python.services.professional_monte_carlo import (
+    ProfessionalMonteCarloEngine, 
+    SimulationConfig, 
+    create_simulation_config,
+    get_trading_days_for_horizon,
+    create_sample_portfolio_weights
+)
+from ml_python.services.professional_historical_data import (
+    ProfessionalHistoricalDataService,
+    get_min_history_days,
+    assess_portfolio_data_quality
+)
+from ml_python.models.forecasting_models import ForecastRequest, MonteCarloResults
 
 app = FastAPI(title="Portfolio Risk Analyzer API")
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app.add_middleware(
     CORSMiddleware,
@@ -68,6 +92,7 @@ class OptimizationResult(BaseModel):
     optimized_metrics: RiskMetrics
     recommendations: List[str]
     explanations: List[str]
+
 
 # Enhanced asset data with ESG scores and sector information
 ASSET_DATA = {
@@ -854,6 +879,8 @@ def generate_explanations(metrics: RiskMetrics, allocation: PortfolioAllocation)
     
     return explanations
 
+
+
 @app.get("/")
 async def root():
     return {"message": "Portfolio Risk Analyzer API"}
@@ -967,6 +994,163 @@ async def get_asset_classes():
             }
         ]
     }
+
+@app.post("/professional-forecast")
+async def professional_monte_carlo_forecast(request: Dict):
+    """
+    Professional Monte Carlo forecast with real financial mathematics
+    """
+    try:
+        logger.info("🚀 Professional Monte Carlo forecast request received")
+        
+        # Extract request parameters
+        holdings = request.get('holdings', [])
+        time_horizon = request.get('time_horizon', '3_months')
+        num_simulations = request.get('num_simulations', 10000)
+        
+        if not holdings:
+            raise HTTPException(status_code=400, detail="Holdings are required")
+        
+        # Extract tickers and create portfolio weights
+        tickers = [holding.get('ticker', holding.get('symbol', '')) for holding in holdings]
+        portfolio_weights = create_sample_portfolio_weights(holdings)
+        
+        if not tickers or not portfolio_weights:
+            raise HTTPException(status_code=400, detail="Invalid holdings data")
+        
+        logger.info(f"📊 Processing {len(tickers)} assets for {time_horizon} forecast")
+        
+        # Initialize services
+        data_service = ProfessionalHistoricalDataService()
+        
+        # Get historical data
+        min_days = get_min_history_days(time_horizon)
+        historical_prices, data_quality = data_service.get_historical_data(tickers, min_days)
+        
+        if historical_prices.empty:
+            logger.warning("⚠️ No historical data available, using fallback synthetic data")
+            historical_prices = data_service.create_fallback_data(tickers, min_days)
+            data_quality = {}
+        
+        # Get current prices
+        current_prices = data_service.get_current_prices(tickers)
+        
+        # Validate data quality
+        quality_results = data_service.validate_data_quality(data_quality, time_horizon)
+        portfolio_quality = assess_portfolio_data_quality(data_quality, portfolio_weights)
+        
+        # Create simulation configuration
+        config = create_simulation_config(time_horizon, num_simulations)
+        
+        # Initialize Monte Carlo engine
+        mc_engine = ProfessionalMonteCarloEngine(config)
+        
+        # Calculate asset parameters
+        asset_parameters = mc_engine.calculate_asset_parameters(
+            historical_prices, current_prices, min_days
+        )
+        
+        # Calculate correlation matrix
+        correlation_matrix = mc_engine.calculate_correlation_matrix(historical_prices)
+        
+        # Run Monte Carlo simulation
+        logger.info(f"🎲 Running {num_simulations} Monte Carlo simulations...")
+        
+        simulation_results = mc_engine.run_monte_carlo_simulation(
+            asset_parameters,
+            portfolio_weights,
+            correlation_matrix,
+            get_trading_days_for_horizon(time_horizon)
+        )
+        
+        # Format results for frontend
+        portfolio_paths = simulation_results['portfolio_paths']
+        statistics = simulation_results['statistics']
+        initial_value = simulation_results['initial_value']
+        
+        # Create time series for chart
+        trading_days = get_trading_days_for_horizon(time_horizon)
+        dates = pd.bdate_range(start=datetime.now(), periods=trading_days + 1)
+        
+        # Format percentile data for charting
+        percentile_data = []
+        for day in range(trading_days + 1):
+            percentile_data.append({
+                'date': dates[day].strftime('%Y-%m-%d'),
+                'day': day,
+                'percentile_5': float(np.percentile(portfolio_paths[:, day], 5)),
+                'percentile_25': float(np.percentile(portfolio_paths[:, day], 25)),
+                'percentile_50': float(np.percentile(portfolio_paths[:, day], 50)),
+                'percentile_75': float(np.percentile(portfolio_paths[:, day], 75)),
+                'percentile_95': float(np.percentile(portfolio_paths[:, day], 95))
+            })
+        
+        # Create comprehensive response
+        response = {
+            'status': 'success',
+            'forecast_data': {
+                'initial_value': initial_value,
+                'time_horizon': time_horizon,
+                'time_horizon_days': trading_days,
+                'num_simulations': num_simulations,
+                'percentile_data': percentile_data,
+                'statistics': statistics,
+                'data_quality': {
+                    'overall_quality_score': portfolio_quality.get('overall_quality_score', 0.0),
+                    'data_coverage': portfolio_quality.get('data_coverage', 0.0),
+                    'assets_with_data': portfolio_quality.get('num_assets_with_data', 0),
+                    'total_assets': portfolio_quality.get('num_total_assets', 0),
+                    'quality_by_asset': {
+                        ticker: {
+                            'quality_score': quality.quality_score,
+                            'data_completeness': quality.data_completeness,
+                            'has_sufficient_data': quality.has_sufficient_data,
+                            'total_days': quality.total_days
+                        } for ticker, quality in data_quality.items()
+                    }
+                },
+                'risk_metrics': {
+                    'value_at_risk_95': statistics.get('var_95', 0),
+                    'value_at_risk_99': statistics.get('var_99', 0),
+                    'expected_shortfall_95': statistics.get('expected_shortfall_95', 0),
+                    'expected_shortfall_99': statistics.get('expected_shortfall_99', 0),
+                    'maximum_drawdown': statistics.get('maximum_drawdown', 0),
+                    'sharpe_ratio': statistics.get('sharpe_ratio', 0),
+                    'sortino_ratio': statistics.get('sortino_ratio', 0),
+                    'probability_positive': statistics.get('probability_positive', 0),
+                    'probability_loss_10_percent': statistics.get('probability_loss_10_percent', 0),
+                    'probability_gain_20_percent': statistics.get('probability_gain_20_percent', 0)
+                }
+            },
+            'metadata': {
+                'engine': 'professional_monte_carlo',
+                'version': '2.0',
+                'generated_at': datetime.now().isoformat(),
+                'data_quality_warning': portfolio_quality.get('data_coverage', 1.0) < 0.9,
+                'warnings': []
+            }
+        }
+        
+        # Add warnings if data quality issues
+        if portfolio_quality.get('data_coverage', 1.0) < 0.9:
+            response['metadata']['warnings'].append(
+                f"Data coverage is {portfolio_quality.get('data_coverage', 0):.1%} - some assets may have insufficient historical data"
+            )
+        
+        if portfolio_quality.get('overall_quality_score', 1.0) < 0.7:
+            response['metadata']['warnings'].append(
+                "Data quality score is below optimal - results may be less accurate"
+            )
+        
+        logger.info("✅ Professional Monte Carlo forecast completed successfully")
+        return response
+        
+    except Exception as e:
+        logger.error(f"❌ Professional Monte Carlo forecast failed: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Forecast generation failed: {str(e)}")
+
 
 if __name__ == "__main__":
     import uvicorn

@@ -18,74 +18,101 @@ export function LandingPage({ isDark, onThemeToggle }: LandingPageProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-all duration-150">
       <Header isDark={isDark} onThemeToggle={onThemeToggle} />
 
-      {/* Hero Section */}
-      <section className="py-20 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              Stop Worrying About Your
-              <span className="text-green-600 dark:text-green-400 block">
-                Investment Portfolio
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              You work hard for your money. Now let's make sure your money works just as hard for you. 
-              Get clear, honest insights about your portfolio's risk and performance in minutes, not months.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      {/* Hero Section - Meraki UI Inspired */}
+      <section className="relative bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-20 lg:py-32">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+          <div className="text-center space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                Your New Portfolio Analyser
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto font-light">
+                Get clear, honest insights about your portfolio's risk and performance in minutes, not months.
+              </p>
+            </div>
+            
+            <div className="flex justify-center items-center pt-4">
               <Link
                 to="/demo"
-                className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold text-lg rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+                className="group inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold text-lg rounded-2xl transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:-translate-y-1"
               >
-                Try Portfolio Risk Analyzer Demo
-                <ArrowRight className="h-5 w-5 ml-2" />
+                View Demo
+                <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Problem Section */}
-      <section className="py-16 bg-white dark:bg-gray-800">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
-              Are You Making These Common Investment Mistakes?
+      {/* Problem Section - Meraki UI Inspired */}
+      <section className="py-20 bg-white dark:bg-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white">
+              Common Investment Challenges
             </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Identify and overcome the obstacles that prevent optimal portfolio performance
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-6 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
-              <h3 className="text-xl font-semibold text-red-800 dark:text-red-200 mb-3">
-                "I think my portfolio is diversified, but I'm not sure..."
-              </h3>
-              <p className="text-red-700 dark:text-red-300">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+            <div className="group p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-3xl border border-gray-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="mb-4">
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-800/30 rounded-2xl flex items-center justify-center mb-4">
+                  <Shield className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                  Unclear Diversification
+                </h3>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 Many investors think they're diversified because they own different stocks, 
                 but they're actually concentrated in similar sectors or risk profiles.
               </p>
             </div>
-            <div className="p-6 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-200 dark:border-orange-800">
-              <h3 className="text-xl font-semibold text-orange-800 dark:text-orange-200 mb-3">
-                "I don't know if I'm taking too much risk"
-              </h3>
-              <p className="text-orange-700 dark:text-orange-300">
+            
+            <div className="group p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-3xl border border-gray-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="mb-4">
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-800/30 rounded-2xl flex items-center justify-center mb-4">
+                  <Target className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                  Unknown Risk Levels
+                </h3>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 Without proper analysis, you might be taking unnecessary risks that could 
                 wipe out years of gains, or playing it too safe and missing growth opportunities.
               </p>
             </div>
-            <div className="p-6 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-800">
-              <h3 className="text-xl font-semibold text-yellow-800 dark:text-yellow-200 mb-3">
-                "Financial advisors are too expensive"
-              </h3>
-              <p className="text-yellow-700 dark:text-yellow-300">
+            
+            <div className="group p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-3xl border border-gray-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="mb-4">
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-800/30 rounded-2xl flex items-center justify-center mb-4">
+                  <DollarSign className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                  Expensive Advisory Fees
+                </h3>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 Professional portfolio analysis can cost thousands of dollars, making it 
                 inaccessible for regular investors who just want basic insights.
               </p>
             </div>
-            <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
-              <h3 className="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-3">
-                "I don't understand the financial jargon"
-              </h3>
-              <p className="text-blue-700 dark:text-blue-300">
+            
+            <div className="group p-8 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-3xl border border-gray-200 dark:border-gray-600 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+              <div className="mb-4">
+                <div className="w-12 h-12 bg-green-100 dark:bg-green-800/30 rounded-2xl flex items-center justify-center mb-4">
+                  <Shield className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                  Complex Financial Jargon
+                </h3>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                 Sharpe ratios, volatility, correlation coefficients - the investment world 
                 speaks in a language that feels designed to confuse everyday investors.
               </p>
@@ -121,8 +148,8 @@ export function LandingPage({ isDark, onThemeToggle }: LandingPageProps) {
             </div>
             
             <div className="text-center p-6">
-              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 dark:bg-blue-800/30 rounded-full flex items-center justify-center">
-                <Target className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 dark:bg-green-800/30 rounded-full flex items-center justify-center">
+                <Target className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                 Get Better Balance
@@ -134,8 +161,8 @@ export function LandingPage({ isDark, onThemeToggle }: LandingPageProps) {
             </div>
             
             <div className="text-center p-6">
-              <div className="w-16 h-16 mx-auto mb-4 bg-purple-100 dark:bg-purple-800/30 rounded-full flex items-center justify-center">
-                <DollarSign className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 dark:bg-green-800/30 rounded-full flex items-center justify-center">
+                <DollarSign className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                 Maximize Your Returns
@@ -151,20 +178,20 @@ export function LandingPage({ isDark, onThemeToggle }: LandingPageProps) {
 
 
       {/* Final CTA Section */}
-      <section className="py-20 bg-green-600 dark:bg-green-800">
+      <section className="py-20 bg-gray-900 dark:bg-gray-800">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to Take Control of Your Financial Future?
           </h2>
-          <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
             It takes less than 5 minutes to analyze your portfolio. No email required, 
             no complicated forms, no sales calls. Just honest insights about your investments.
           </p>
           <Link
             to="/demo"
-            className="inline-flex items-center px-8 py-4 bg-white hover:bg-gray-100 text-green-600 font-semibold text-lg rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+            className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold text-lg rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
           >
-            Try Portfolio Risk Analyzer Demo
+            View Demo
             <ArrowRight className="h-5 w-5 ml-2" />
           </Link>
         </div>

@@ -27,14 +27,15 @@ export interface Portfolio {
 
 export interface AssetAllocation {
   stocks: number;
+  etfs: number;
+  crypto: number;
   bonds: number;
   realEstate: number;
   cash: number;
-  crypto: number;
   commodities: number;
 }
 
-export type AssetCategory = 'stocks' | 'bonds' | 'realEstate' | 'cash' | 'crypto' | 'commodities';
+export type AssetCategory = 'stocks' | 'etfs' | 'crypto' | 'bonds' | 'realEstate' | 'cash' | 'commodities';
 
 export interface PortfolioSummary {
   totalValue: number;
@@ -53,6 +54,8 @@ export interface StockQuote {
   change: number;
   changePercent: number;
   lastUpdated: string;
+  isCrypto?: boolean;
+  type?: string;
 }
 
 // Form interfaces for manual input
@@ -60,18 +63,18 @@ export interface HoldingFormData {
   ticker: string;
   name: string;
   quantity: number;
-  purchasePrice: number;
   currentPrice: number;
   category: AssetCategory;
+  holdingValue?: number; // Calculated field
 }
 
 export interface HoldingFormErrors {
   ticker?: string;
   name?: string;
   quantity?: string;
-  purchasePrice?: string;
   currentPrice?: string;
   category?: string;
+  holdingValue?: string;
 }
 
 export interface AllocationFormData {

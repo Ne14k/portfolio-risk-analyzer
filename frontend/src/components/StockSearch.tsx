@@ -1,20 +1,32 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Autorenew, TrendingUp, Business } from '@mui/icons-material';
+import { Search, Autorenew, TrendingUp, Business, CurrencyBitcoin } from '@mui/icons-material';
 import { searchStocks, finnhubService } from '../services/finnhub';
 import type { StockSearchResult } from '../services/finnhub';
 
 interface StockSearchProps {
-  onSelect: (stock: { symbol: string; name: string }) => void;
+  onSelect: (stock: { symbol: string; name: string; type: string }) => void;
   placeholder?: string;
   className?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  onLookup?: () => void;
 }
 
-export function StockSearch({ onSelect, placeholder = "Search stocks...", className = "" }: StockSearchProps) {
-  const [query, setQuery] = useState('');
+export function StockSearch({ onSelect, placeholder = "Search stocks, ETFs, crypto...", className = "", value, onChange, onLookup }: StockSearchProps) {
+  const [query, setQuery] = useState(value || '');
   const [results, setResults] = useState<StockSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [apiStatus, setApiStatus] = useState(finnhubService.getApiStatus());
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [searchDisabled, setSearchDisabled] = useState(false);
+
+  // Sync external value with internal state
+  useEffect(() => {
+    if (value !== undefined && value !== query) {
+      setQuery(value);
+    }
+  }, [value, query]);
 
   // Debounced search function
   const debouncedSearch = useCallback((searchQuery: string) => {
@@ -27,7 +39,9 @@ export function StockSearch({ onSelect, placeholder = "Search stocks...", classN
 
       setLoading(true);
       try {
+        console.log('Starting search for:', query);
         const searchResults = await searchStocks(query);
+        console.log('Search results received:', searchResults);
         setResults(searchResults);
         setShowResults(true);
       } catch (error) {
@@ -42,8 +56,11 @@ export function StockSearch({ onSelect, placeholder = "Search stocks...", classN
   }, []);
 
   useEffect(() => {
-    debouncedSearch(query);
-  }, [query, debouncedSearch]);
+    if (!searchDisabled) {
+      debouncedSearch(query);
+    }
+    setSelectedIndex(-1); // Reset selection when query changes
+  }, [query, debouncedSearch, searchDisabled]);
 
   useEffect(() => {
     // Check API status on mount
@@ -51,13 +68,47 @@ export function StockSearch({ onSelect, placeholder = "Search stocks...", classN
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
+    const newValue = e.target.value;
+    setQuery(newValue);
+    onChange?.(newValue);
+    setSelectedIndex(-1); // Reset selection when typing
+    setSearchDisabled(false); // Re-enable search when user manually types
   };
 
   const handleSelect = (stock: StockSearchResult) => {
-    onSelect({ symbol: stock.symbol, name: stock.name });
-    setQuery('');
+    setQuery(stock.symbol);
+    onChange?.(stock.symbol);
+    onSelect({ symbol: stock.symbol, name: stock.name, type: stock.type });
     setShowResults(false);
+    setSelectedIndex(-1);
+    setSearchDisabled(true); // Disable search completely after selection
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => 
+        prev < results.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && results[selectedIndex]) {
+        // Select the highlighted result
+        handleSelect(results[selectedIndex]);
+      } else if (results.length > 0 && query.trim()) {
+        // Auto-select the first result if there are results
+        handleSelect(results[0]);
+      } else if (query.trim()) {
+        // Just trigger lookup with current value
+        onLookup?.();
+      }
+    } else if (e.key === 'Escape') {
+      setShowResults(false);
+      setSelectedIndex(-1);
+    }
   };
 
   const handleBlur = () => {
@@ -67,12 +118,6 @@ export function StockSearch({ onSelect, placeholder = "Search stocks...", classN
 
   return (
     <div className={`relative ${className}`}>
-      {/* API Status Warning */}
-      {apiStatus.demo && (
-        <div className="mb-2 text-xs text-amber-600 dark:text-amber-400">
-          Using demo mode - limited search results available
-        </div>
-      )}
       
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -87,6 +132,7 @@ export function StockSearch({ onSelect, placeholder = "Search stocks...", classN
           type="text"
           value={query}
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           onBlur={handleBlur}
           onFocus={() => query && setShowResults(true)}
           placeholder={placeholder}
@@ -102,7 +148,11 @@ export function StockSearch({ onSelect, placeholder = "Search stocks...", classN
               <button
                 key={`${stock.symbol}-${index}`}
                 onClick={() => handleSelect(stock)}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600 last:border-b-0 transition-colors"
+                className={`w-full px-4 py-3 text-left border-b border-gray-100 dark:border-gray-600 last:border-b-0 transition-colors ${
+                  index === selectedIndex 
+                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700' 
+                    : 'hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
@@ -121,6 +171,8 @@ export function StockSearch({ onSelect, placeholder = "Search stocks...", classN
                   <div className="ml-3 flex-shrink-0">
                     {stock.type === 'ETF' ? (
                       <Business className="h-4 w-4 text-blue-500" />
+                    ) : stock.type === 'Crypto' ? (
+                      <CurrencyBitcoin className="h-4 w-4 text-orange-500" />
                     ) : (
                       <TrendingUp className="h-4 w-4 text-green-500" />
                     )}
