@@ -25,6 +25,7 @@
   ## 📋 Table of Contents
 
   - [About The Project](#about-the-project)
+  - [Images](#images)
   - [Features](#features)
   - [Built With](#built-with)
   - [Usage](#usage)
@@ -42,6 +43,13 @@
   - **Optimization**: Get data-driven recommendations to improve your portfolio's risk-return profile
   - **Modern Interface**: Clean, responsive design that works on desktop and mobile devices
 
+
+  ---
+
+  ## Images
+  <img width="3228" height="1764" alt="image" src="https://github.com/user-attachments/assets/3379e059-caaf-4708-9629-040ba1e761b6" />
+
+  
   ---
 
   ## Features
