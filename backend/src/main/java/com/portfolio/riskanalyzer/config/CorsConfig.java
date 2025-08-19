@@ -15,9 +15,10 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Arrays.asList(
-            "http://localhost:3000",
-            "https://myportfoliotracker.xyz",
-            "https://*.myportfoliotracker.xyz"
+            "http://localhost:3000",  // Local development
+            "https://myportfoliotracker.xyz",  // Custom domain
+            "https://*.myportfoliotracker.xyz",  // Subdomains
+            "https://*.vercel.app"  // Vercel domains
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));

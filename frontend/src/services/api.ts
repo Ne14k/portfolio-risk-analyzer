@@ -1,7 +1,11 @@
 import axios from 'axios';
 import { PortfolioInput, OptimizationResult, AssetClass } from '../types';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.myportfoliotracker.xyz';
+const API_BASE_URL = process.env.REACT_APP_API_URL || (
+  process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:8000' 
+    : 'https://api.myportfoliotracker.xyz'
+);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
